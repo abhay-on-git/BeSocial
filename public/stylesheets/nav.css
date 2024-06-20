@@ -1,0 +1,4 @@
+nav ul li a:hover span {
+    transform: scaleX(1);
+    transition: all 0.3s ease;
+  }
