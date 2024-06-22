@@ -4,6 +4,13 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const passport = require('passport')
+const passportLocal = require('passport-local')
+const session = require('express-session')
+const userCollection = require('./models/userCollection')
+const LocalStrategy = require("passport-local").Strategy;
+
+
 
 require("./dbConnection").connect().then(()=>console.log("MONGO-DB Connected"))
 
@@ -11,6 +18,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -21,6 +30,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json()); 
+
+// passport set-up
+app.use(
+  session({
+      secret: process.env.SESSION_SECRET || 'default-secret',
+      resave: false,
+      saveUninitialized: true,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(userCollection.authenticate()));
+passport.serializeUser(userCollection.serializeUser());
+passport.deserializeUser(userCollection.deserializeUser());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
