@@ -42,7 +42,7 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(userCollection.authenticate()));
+// passport.use(new LocalStrategy(userCollection.authenticate()));
 passport.serializeUser(userCollection.serializeUser());
 passport.deserializeUser(userCollection.deserializeUser());
 

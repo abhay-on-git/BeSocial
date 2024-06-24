@@ -1,0 +1,82 @@
+<%- include('./partials/header') %>
+<%- include('./partials/nav') %>
+
+<!-- Edit Profile Header Section -->
+<section class="w-full bg-[#4f46e5] text-white py-16 flex flex-col items-center">
+  <div class="max-w-4xl text-center px-4">
+    <h1 class="text-4xl font-bold mb-2">Edit Profile</h1>
+    <p class="text-lg mb-6">Update your personal details and profile settings</p>
+  </div>
+</section>
+
+<!-- Edit Profile Form Section -->
+<section class="w-full py-16 bg-white-300 text-gray-700">
+  <div class="max-w-3xl mx-auto px-4">
+    <form action="/users/update-profile" method="POST" enctype="multipart/form-data" class="bg-white p-8 rounded-lg border-[0.5px] shadow-lg">
+    <input type="hidden" name="oldAvatar" value="<%= user.avatar %>">
+      <h2 class="text-2xl text-center font-bold mb-6 text-[#4f46e5]">Profile Information</h2>
+
+      <!-- Profile Picture -->
+      <div class="flex flex-col items-center mb-8">
+        <div class="relative mb-4">
+          <img id="avatar-preview" src="<%= user.avatar %>" alt="User Avatar" class="rounded-full h-32 w-32 mb-4 shadow-lg object-cover">
+          <button type="button" id="change-avatar-button" class="absolute bottom-0 left-[20%] bg-[#4f46e5] text-white py-1 px-3 rounded-full hover:bg-[#3f40d1] transition duration-300">Change</button>
+        </div>
+        <input type="file" name="avatar" id="avatar-input" class="hidden" accept="image/*">
+      </div>
+
+      <!-- Personal Information -->
+      <div class="grid grid-cols-1 gap-6 mb-8">
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+          <input placeholder="username" type="text" name="username" id="name" value="<%= user.username %>" class="mt-1 p-2 w-full border rounded-md shadow-sm focus:ring-[#4f46e5] focus:border-[#4f46e5]">
+        </div>
+        <div>
+          <label for="bio" class="block text-sm font-medium text-gray-700">Bio</label>
+          <input placeholder="I do Social Contributions..." type="text" name="bio" id="bio" value="<%= user.bio %>" class="mt-1 p-2 w-full border rounded-md shadow-sm focus:ring-[#4f46e5] focus:border-[#4f46e5]">
+        </div>
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+          <input placeholder="abc@gmail.com" type="email" name="email" id="email" value="<%= user.email %>" class="mt-1 p-2 w-full border rounded-md shadow-sm focus:ring-[#4f46e5] focus:border-[#4f46e5]">
+        </div>
+        <div>
+          <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
+          <input placeholder="India" type="text" name="location" id="location" value="<%= user.location %>" class="mt-1 p-2 w-full border rounded-md shadow-sm focus:ring-[#4f46e5] focus:border-[#4f46e5]">
+        </div>
+        <div>
+          <label for="interests" class="block text-sm font-medium text-gray-700">Interests</label>
+          <input placeholder="Cricket" type="text" name="interests" id="interests" value="<%= user.interests %>" class="mt-1 p-2 w-full border rounded-md shadow-sm focus:ring-[#4f46e5] focus:border-[#4f46e5]">
+        </div>
+        <div>
+          <label for="website" class="block text-sm font-medium text-gray-700">Website</label>
+          <input placeholder="abc.com" type="url" name="website" id="website" value="<%= user.website %>" class="mt-1 p-2 w-full border rounded-md shadow-sm focus:ring-[#4f46e5] focus:border-[#4f46e5]">
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end space-x-4">
+        <a href="/users/profile" class="inline-block bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg shadow-md hover:bg-gray-300 transition duration-300">Cancel</a>
+        <button type="submit" class="inline-block bg-[#4f46e5] text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-[#3f40d1] transition duration-300">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+    document.getElementById('change-avatar-button').addEventListener('click', function() {
+      document.getElementById('avatar-input').click();
+    });
+  
+    document.getElementById('avatar-input').addEventListener('change', function(event) {
+      if (event.target.files && event.target.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('avatar-preview').src = e.target.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+        // console.log(reader.readAsDataURL(event.target.files[0]))
+      }
+    });
+  </script>
+
+<%- include('./partials/footer') %>
