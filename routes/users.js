@@ -1,22 +1,25 @@
 const express = require("express");
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
-
+const fs = require("fs");
+const path = require("path");
+const mongoose = require("mongoose");
 
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const userCollection = require("../models/userCollection");
 const { isLoggedIn } = require("../middlewares/auth");
-const upload = require('../utils/multer')
+const upload = require("../utils/multer");
+const { resetPasswordViaOTP } = require("../utils/resetPasswordViaOTP");
 
-passport.use(new LocalStrategy(
-  {
-    usernameField: 'email', // Tell Passport to use 'email' instead of 'username'
-    passwordField: 'password' // Field name for password
-  },
-  userCollection.authenticate()
-));
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email", // Tell Passport to use 'email' instead of 'username'
+      passwordField: "password", // Field name for password
+    },
+    userCollection.authenticate()
+  )
+);
 /* POST users listing. */
 router.post("/signup", async function (req, res, next) {
   try {
@@ -38,63 +41,142 @@ router.post("/signin", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
       console.error("Authentication error:", err);
-      return next(err);  // Call next middleware with the error
+      return next(err); // Call next middleware with the error
     }
     if (!user) {
       console.log("Authentication failed:", info.message);
-      return res.status(401).send("Authentication failed: " + info.message);  // Return detailed message
+      return res.status(401).send("Authentication failed: " + info.message); // Return detailed message
     }
     req.logIn(user, (err) => {
       if (err) {
         console.error("Login error:", err);
-        return next(err);  // Call next middleware with the error
+        return next(err); // Call next middleware with the error
       }
       return res.redirect("/users/profile");
     });
   })(req, res, next);
 });
 
-
 router.get("/profile", isLoggedIn, (req, res, next) => {
-  res.render("profile",{ user: req.user });
+  res.render("profile", { user: req.user });
 });
 
 router.get("/logout", isLoggedIn, (req, res, next) => {
   req.logout(() => {
-      res.redirect("/signin");
+    res.redirect("/signin");
   });
 });
 
-router.post('/update-profile',isLoggedIn,upload.single('avatar'), async function(req, res, next) {
-  // const {username,email,location,website,bio,intrests} = req.body;
-  const id = req.user._id;
+router.post(
+  "/update-profile",
+  isLoggedIn,
+  upload.single("avatar"),
+  async function (req, res, next) {
+    // const {username,email,location,website,bio,intrests} = req.body;
+    const id = req.user._id;
+    try {
+      const user = await userCollection.findById(id);
+      const userData = req.body;
+      // console.log(req.body)
+
+      if (req.file) {
+        userData.avatar = `/images/${req.file.filename}`;
+        if(!user.avatar.startsWith('https')){
+          fs.unlinkSync(path.join(__dirname, "..", "public", `${user.avatar}`));
+        }
+      } else {
+        userData.avatar = user.avatar;
+      }
+
+      const updatedUser = await userCollection.findByIdAndUpdate(id, userData, {
+        new: true,
+      });
+
+      if (!updatedUser) {
+        return res.status(404).send("User not found");
+      }
+
+      console.log("User updated successfully:", updatedUser);
+
+      res.redirect("/users/profile");
+    } catch (error) {
+      console.log(error.message);
+      throw error;
+    }
+  }
+);
+
+router.post("/forgot-password", async (req, res, next) => {
   try {
-    const user = await userCollection.findById(id);
-    const userData = req.body
-    // console.log(req.body)
+    const user = await userCollection.findOne({ email: req.body.email });
+    if (!user)
+      return res.send(
+        "No user found with this email. <a href='/forget-password'>Try Again</a>"
+      );
 
-    if(req.file) {
-      userData.avatar = `/images/${req.file.filename}`
-      fs.unlinkSync(path.join(__dirname, '..', 'public', `${user.avatar}`));
-    }else{
-      userData.avatar = user.avatar;
+    await resetPasswordViaOTP(req, res, user, (ifResend = false));
+  } catch (error) {
+    console.error("Error in forgot-password route:", error);
+    res.status(500).send("An error occurred. Please try again later.");
+  }
+});
+
+router.post("/verify-otp/:id", async (req, res, next) => {
+  const id = req.params.id;
+  const idd = new mongoose.Types.ObjectId(id);
+  try {
+    const user = await userCollection.findById({ _id: idd });
+    if (!user) return res.send("No user found.");
+
+    if (user.otp != req.body.otp) {
+      user.otp = 0;
+      await user.save();
+      return res.send("Invalid OTP. <a href='/forget-password'>Try Again</a>");
     }
 
-    const updatedUser = await userCollection.findByIdAndUpdate(id, userData, { new: true });
+    user.otp = 0;
+    res.redirect(`/reset-password/${id}`);
+  } catch (error) {
+    console.log(error);
+    res.send(error.message);
+  }
+});
+// router.post('/resend-otp/:id',async(req,res,next)=>{
+//   await resetPasswordViaOTP(req, res, user);
+// })
+router.post("/reset-password/:id", async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const user = await userCollection.findById({ _id: id});
+    if (!user) return res.send("No user found.");
 
-    if (!updatedUser) {
-      return res.status(404).send('User not found');
+    await user.setPassword(req.body.password);
+    await user.save();
+    res.redirect("/signin");
+  } catch (error) {
+    console.log(error.message);
+    throw error;
+  }
+});
+
+router.post('/resetOldPassword/:id',async (req,res,next)=>{
+  const id = req.params.id;
+  try {
+    const user = await userCollection.findById({ _id: id});
+    if (!user) return res.send("No user found.");
+    if(user.password != req.body.oldPassword){
+      console.log(user,'user')
+      console.log(user.password,'user.password')
+      console.log(req.body.oldPassword,'req.body.oldPassword')
+      return res.send("Old password is incorrect");
     }
-
-    console.log('User updated successfully:', updatedUser);
-
-    res.redirect('/users/profile');
-    
+    await user.setPassword(req.body.newPassword);
+    await user.save();
+    res.redirect("/signin");
   } catch (error) {
     console.log(error.message)
-    throw(error)
+    throw error
   }
-
-});
+})
 
 module.exports = router;

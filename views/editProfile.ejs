@@ -54,9 +54,12 @@
       </div>
 
       <!-- Actions -->
-      <div class="flex justify-end space-x-4">
-        <a href="/users/profile" class="inline-block bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg shadow-md hover:bg-gray-300 transition duration-300">Cancel</a>
-        <button type="submit" class="inline-block bg-[#4f46e5] text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-[#3f40d1] transition duration-300">Save Changes</button>
+      <div class="flex justify-between">
+        <a href="/resetOldPassword/<%= user._id %>" class="text-md text-[#4f46e5] hover:underline">Reset Password</a>
+        <div class="flex justify-end space-x-4">
+          <a href="/users/profile" class="inline-block bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg shadow-md hover:bg-gray-300 transition duration-300">Cancel</a>
+          <button type="submit" class="inline-block bg-[#4f46e5] text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-[#3f40d1] transition duration-300">Save Changes</button>
+        </div>
       </div>
     </form>
   </div>
