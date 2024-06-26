@@ -159,19 +159,10 @@ router.post("/reset-password/:id", async (req, res, next) => {
   }
 });
 
-router.post('/resetOldPassword/:id',async (req,res,next)=>{
-  const id = req.params.id;
+router.post('/resetOldPassword',async (req,res,next)=>{
   try {
-    const user = await userCollection.findById({ _id: id});
-    if (!user) return res.send("No user found.");
-    if(user.password != req.body.oldPassword){
-      console.log(user,'user')
-      console.log(user.password,'user.password')
-      console.log(req.body.oldPassword,'req.body.oldPassword')
-      return res.send("Old password is incorrect");
-    }
-    await user.setPassword(req.body.newPassword);
-    await user.save();
+    await req.user.changePassword(req.body.oldPassword, req.body.newPassword);
+    await req.user.save();
     res.redirect("/signin");
   } catch (error) {
     console.log(error.message)
