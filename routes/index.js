@@ -60,4 +60,17 @@ router.get('/resetOldPassword/:id',(req,res,next)=>{
   })
 })
 
+
+router.get('/feed',(req,res,next)=>{
+  res.render('feed',{
+    user: req.user,
+    id: req.params.id,
+  })
+})
+router.get('/forums',(req,res,next)=>{
+  res.render('forums',{
+    user: req.user,
+    id: req.params.id,
+  })
+})
 module.exports = router;

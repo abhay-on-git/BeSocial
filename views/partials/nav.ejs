@@ -28,7 +28,23 @@
           About
         </a>
       </li>
+      <li>
+        <a
+          href="/feed"
+          class="text-gray-700 relative overflow-hidden pb-[1px] border-b-[2px] border-transparent transition duration-200 hover:text-[#4f46e5] hover:border-[#4f46e5]"
+        >
+          Feed
+        </a>
+      </li>
       <% if (locals.user) { %>
+        <li>
+          <a
+            href="/forums"
+            class="text-gray-700 relative overflow-hidden pb-[1px] border-b-[2px] border-transparent transition duration-200 hover:text-[#4f46e5] hover:border-[#4f46e5]"
+          >
+            Forums
+          </a>
+        </li>
         <li>
           <a
             href="/users/profile/<% locals.user._id %>"

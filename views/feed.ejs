@@ -1,0 +1,117 @@
+<%- include('./partials/header') %>
+<%- include('./partials/nav') %>
+
+<!-- Feed Container -->
+<div class="bg-gray-100 flex flex-col items-center min-h-screen py-6">
+
+    <!-- Feed Content -->
+    <div class="max-w-3xl w-full bg-white p-6 rounded-lg shadow-md">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-indigo-600">BeSocial Feed</h2>
+            <button onclick="document.getElementById('new-post-modal').classList.remove('hidden')"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                Add New Post
+            </button>
+        </div>
+
+        <!-- Posts Feed -->
+        <div class="space-y-6">
+            <% const dummyPosts = [
+                { author: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/1.jpg', createdAt: '2024-06-24', content: 'This is my first post!', image: 'https://via.placeholder.com/400x200' },
+                { author: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', createdAt: '2024-06-23', content: 'Loving this new social platform!', image: 'https://via.placeholder.com/400x200' },
+                { author: 'Alice Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg', createdAt: '2024-06-22', content: 'Can’t wait to see more updates!', image: 'https://via.placeholder.com/400x200' }
+            ]; %>
+            <% dummyPosts.forEach(post => { %>
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <div class="flex items-center mb-2">
+                        <img src="<%= post.avatar %>" alt="User Avatar" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <h4 class="text-gray-900 font-semibold"><%= post.author %></h4>
+                            <p class="text-gray-600 text-sm"><%= new Date(post.createdAt).toDateString() %></p>
+                        </div>
+                    </div>
+                    <p class="text-gray-800 mb-4"><%= post.content %></p>
+                    <% if (post.image) { %>
+                        <img src="<%= post.image %>" alt="Post Image" class="w-full rounded-lg mb-4">
+                    <% } %>
+                    <div class="flex justify-between items-center">
+                        <div class="flex space-x-4">
+                            <button class="flex items-center space-x-2 text-gray-600 hover:text-indigo-600">
+                            <span>1</span>
+                                <span>Like</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-gray-600 hover:text-red-600">
+                                <span>0</span>
+                                <span>Dislike</span>
+                            </button>
+                        </div>
+                        <button onclick="toggleComments(<%= post.author %>)" class="flex items-center space-x-2 text-gray-600 hover:text-indigo-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 16a2 2 0 01-2 2H7l-4 4v-4a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v9z"></path>
+                            </svg>
+                            <span>Comment</span>
+                        </button>
+                    </div>
+                    <!-- Comment Section -->
+                    <div id="comments-<%= post.author %>" class="mt-4 hidden">
+                        <form class="space-y-2">
+                            <textarea rows="2" placeholder="Add a comment..." 
+                                class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                            <button type="button" 
+                                class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors">
+                                Post Comment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+
+    </div>
+
+    <!-- New Post Modal -->
+    <div id="new-post-modal" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Add New Post</h3>
+                <button onclick="document.getElementById('new-post-modal').classList.add('hidden')"
+                    class="text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            <form action="/posts" method="POST" enctype="multipart/form-data" class="space-y-4">
+                <div>
+                    <label for="content" class="block text-gray-700 font-semibold mb-2">Post Content:</label>
+                    <textarea id="content" name="content" required 
+                        class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                        placeholder="What's on your mind?"></textarea>
+                </div>
+                <div>
+                    <label for="image" class="block text-gray-700 font-semibold mb-2">Image (optional):</label>
+                    <input type="file" id="image" name="image" accept="image/*" class="hidden" onchange="showFileName(this)">
+                    <label for="image" 
+                        class="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors inline-block">
+                        Choose Image
+                    </label>
+                    <span id="file-name" class="ml-2 text-gray-600"></span>
+                </div>
+                <button type="submit" 
+                    class="w-full bg-indigo-600 text-white p-3 rounded-lg hover:bg-indigo-700 transition-colors">
+                    Post
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+    function showFileName(input) {
+        const fileName = input.files[0] ? input.files[0].name : '';
+        document.getElementById('file-name').textContent = fileName;
+    }
+function toggleComments(postAuthor) {
+    const commentSection = document.getElementById('comments-' + postAuthor);
+    commentSection.classList.toggle('hidden');
+}
+</script>
+
+<%- include('./partials/footer') %>
