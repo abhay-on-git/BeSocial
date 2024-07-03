@@ -34,7 +34,6 @@ router.get("/resend-otp/:id",async (req, res) => {
   const id = req.params.id
   try {
     const user = await userCollection.findOne({ _id: id });
-    console.log();
     
 
     await resetPasswordViaOTP(req, res, user,ifResend = true);
@@ -64,11 +63,8 @@ router.get('/resetOldPassword/:id',(req,res,next)=>{
 
 router.get('/feed',async (req,res,next)=>{
   const posts = await Post.find().populate('createdBy')
-  console.log(posts,"posts")
   res.render('feed',{
-    user: req.user,
-    id: req.params.id,
-    // posts: posts
+    posts
   })
 })
 

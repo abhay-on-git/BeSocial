@@ -12,6 +12,7 @@ const upload = require("../utils/multer");
 const { resetPasswordViaOTP } = require("../utils/resetPasswordViaOTP");
 const Post = require('../models/post');
 const uploadPost = require("../utils/uploadPost");
+const { log } = require("console");
 
 passport.use(
   new LocalStrategy(
@@ -82,7 +83,7 @@ router.post(
       // console.log(req.body)
 
       if (req.file) {
-        userData.avatar = `/images/${req.file.filename}`;
+        userData.avatar = req.file.path;
         if(!user.avatar.startsWith('https')){
           fs.unlinkSync(path.join(__dirname, "..", "public", `${user.avatar}`));
         }
@@ -136,7 +137,7 @@ router.post("/verify-otp/:id", async (req, res, next) => {
       return res.send("Invalid OTP. <a href='/forget-password'>Try Again</a>");
     }
 
-    user.otp = 0;
+     user.otp = 0;
     res.redirect(`/reset-password/${id}`);
   } catch (error) {
     console.log(error);
@@ -175,7 +176,8 @@ router.post('/resetOldPassword',async (req,res,next)=>{
 // Post CRUD Code Starts from here
 router.post("/create-post",isLoggedIn, uploadPost.single('postImage'),async(req,res,next)=>{
   try {
-    const postData = req.body
+    const postData = req.body;
+    console.log(req.file.path);
     if(req.file){
       postData.postImage = req.file.path
     }else{
@@ -184,16 +186,13 @@ router.post("/create-post",isLoggedIn, uploadPost.single('postImage'),async(req,
     postData.createdBy = req.user._id;
     
     const post = await Post.create(postData)
+
+    post.createdBy = req.user._id
     req.user.posts.push(post._id)
-
-    // await user.save(post)
-    // await  user.save(req.user)
-
+    
     await req.user.save()
     await post.save()
-
-
-    // console.log(req.user);
+    
     res.redirect(`/feed`)
   } catch (error) {
     console.log(error.message)
