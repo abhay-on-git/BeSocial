@@ -10,6 +10,8 @@ const userCollection = require("../models/userCollection");
 const { isLoggedIn } = require("../middlewares/auth");
 const upload = require("../utils/multer");
 const { resetPasswordViaOTP } = require("../utils/resetPasswordViaOTP");
+const Post = require('../models/post');
+const uploadPost = require("../utils/uploadPost");
 
 passport.use(
   new LocalStrategy(
@@ -168,6 +170,36 @@ router.post('/resetOldPassword',async (req,res,next)=>{
     console.log(error.message)
     throw error
   }
+})
+
+// Post CRUD Code Starts from here
+router.post("/create-post",isLoggedIn, uploadPost.single('postImage'),async(req,res,next)=>{
+  try {
+    const postData = req.body
+    if(req.file){
+      postData.postImage = req.file.path
+    }else{
+      postData.postImage = null;
+    }
+    postData.createdBy = req.user._id;
+    
+    const post = await Post.create(postData)
+    req.user.posts.push(post._id)
+
+    // await user.save(post)
+    // await  user.save(req.user)
+
+    await req.user.save()
+    await post.save()
+
+
+    // console.log(req.user);
+    res.redirect(`/feed`)
+  } catch (error) {
+    console.log(error.message)
+    throw(error)
+  }
+   
 })
 
 module.exports = router;

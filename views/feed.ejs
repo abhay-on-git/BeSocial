@@ -79,16 +79,16 @@
                 <button onclick="document.getElementById('new-post-modal').classList.add('hidden')"
                     class="text-gray-500 hover:text-gray-700">&times;</button>
             </div>
-            <form action="/posts" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <form action="/users/create-post" method="POST" enctype="multipart/form-data" class="space-y-4">
                 <div>
                     <label for="content" class="block text-gray-700 font-semibold mb-2">Post Content:</label>
-                    <textarea id="content" name="content" required 
+                    <textarea id="content" name="postContent" required 
                         class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" 
                         placeholder="What's on your mind?"></textarea>
                 </div>
                 <div>
                     <label for="image" class="block text-gray-700 font-semibold mb-2">Image (optional):</label>
-                    <input type="file" id="image" name="image" accept="image/*" class="hidden" onchange="showFileName(this)">
+                    <input type="file" id="image" name="postImage" accept="image/*" class="hidden" onchange="showFileName(this)">
                     <label for="image" 
                         class="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors inline-block">
                         Choose Image

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const {resetPasswordViaOTP} = require('../utils/resetPasswordViaOTP')
 const userCollection = require("../models/userCollection");
+const Post = require('../models/post')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -61,12 +62,16 @@ router.get('/resetOldPassword/:id',(req,res,next)=>{
 })
 
 
-router.get('/feed',(req,res,next)=>{
+router.get('/feed',async (req,res,next)=>{
+  const posts = await Post.find().populate('createdBy')
+  console.log(posts,"posts")
   res.render('feed',{
     user: req.user,
     id: req.params.id,
+    // posts: posts
   })
 })
+
 router.get('/forums',(req,res,next)=>{
   res.render('forums',{
     user: req.user,
