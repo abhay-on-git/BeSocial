@@ -30,39 +30,57 @@
                         <img src="<%=post.createdBy?.avatar ? '/public'+post.createdBy?.avatar : 'https://randomuser.me/api/portraits/women/2.jpg'  %>" alt="User Avatar" class="w-10 h-10 rounded-full mr-3">
                       
                         <div>
-                            <h4 class="text-gray-900 font-semibold"></h4>
+                            <h4 class="text-gray-900 font-semibold"><%= post.createdBy?.username %></h4>
                             <p class="text-gray-600 text-sm"><%= new Date(post.createdAt).toDateString() %></p>
                         </div>
                     </div>
                     <p class="text-gray-800 mb-4"><%= post.postContent%></p>
                     <% if (post.postImage) { %>
-                        <% console.log(post.postImage,'LLLLLLLL') %>
-                        <img src="<%= post.postImage || 'https://randomuser.me/api/portraits/women/2.jpg' %>" alt="Post Image" class="w-full rounded-lg mb-4">
+                        <!-- <% console.log(post.postImage,'LLLLLLLL') %> -->
+                        <img src="<%= post.postImage || 'https://randomuser.me/api/portraits/women/2.jpg' %>" alt="Post Image" class="w-[250px] m-auto rounded-lg mb-4">
                     <% } %>
                     <div class="flex justify-between items-center">
                         <div class="flex space-x-4">
-                            <button class="flex items-center space-x-2 text-gray-600 hover:text-indigo-600">
-                            <span><%= post.likes.length %></span>
-                                <span>Like</span>
-                            </button>
-                            <button class="flex items-center space-x-2 text-gray-600 hover:text-red-600">
-                                <span><%= post.dislikes.length %></span>
-                                <span>Dislike</span>
-                            </button>
+                            <form action="/users/like/<%= post._id %>" method="post">
+                                <button class="flex items-center space-x-2 text-gray-600 hover:text-indigo-600">
+                                    <span><%= post.likes.length %></span>
+                                        <span>Like</span>
+                                    </button>
+                            </form>
+                            <form action="/users/dislike/<%= post._id %>" method="post">
+                                <button class="flex items-center space-x-2 text-gray-600 hover:text-red-600">
+                                    <span><%= post.dislikes.length %></span>
+                                    <span>Dislike</span>
+                                </button>
+                            </form>
                         </div>  
-                        <button onclick="toggleComments('<%= post.createdBy?.username  %>')" class="flex items-center space-x-2 text-gray-600 hover:text-indigo-600">
+                        <button onclick="toggleComments('<%= post._id %>')" class="flex items-center space-x-2 text-gray-600 hover:text-indigo-600">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 16a2 2 0 01-2 2H7l-4 4v-4a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v9z"></path>
                             </svg>
                             <span>Comment</span>
+                            <span>(<%= post.comments.length %>)</span>
                         </button>
                     </div>
                     <!-- Comment Section -->
-                    <div id="comments-<%= post.createdBy?.username %>" class="mt-4 hidden">
-                        <form class="space-y-2">
-                            <textarea rows="2" placeholder="Add a comment..." 
-                                class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-                            <button type="button" 
+                    <div id="comments-<%= post._id %>" class="mt-4 hidden">
+                        <% post.comments.forEach(comment => { %>
+                            <!-- <% console.log(comment , 'cccccccc') %> -->
+                            <div class="flex items-center mb-2">
+                                <img src="<%=comment.createdBy?.avatar ? '/public'+comment.createdBy?.avatar : 'https://randomuser.me/api/portraits/women/2.jpg'  %>" alt="User Avatar" class="w-8 h-8 rounded-full mr-3">
+                            <div>
+                               <div class="flex gap-2 items-center ">
+                                   <h6 class="text-gray-900 font-semibold"><%= comment.createdBy?.username %></h6>
+                                <p class="text-gray-600 text-[12px]"><%= new Date(comment.createdAt).toDateString() %></p>
+                               </div>
+                               <p class="text-gray-900 font-semibold text-md"><%= comment.content%></p>
+                            </div>
+                        </div>
+                           <% }) %>
+                        <form class="space-y-2" action="/users/comment/<%= post._id %>" method="post">
+                            <input rows="2" name="content" placeholder="Add a comment..." 
+                                class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                            <button type="submit" 
                                 class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors">
                                 Post Comment
                             </button>
@@ -111,8 +129,8 @@
         const fileName = input.files[0] ? input.files[0].name : '';
         document.getElementById('file-name').textContent = fileName;
     }
-function toggleComments(postAuthor) {
-    const commentSection = document.getElementById('comments-' + postAuthor);
+function toggleComments(postId) {
+    const commentSection = document.getElementById('comments-' + postId);
     commentSection.classList.toggle('hidden');
 }
 </script>

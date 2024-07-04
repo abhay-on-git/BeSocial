@@ -9,9 +9,9 @@ const postSchema = Schema(
     postImage: {
       type: String,
     },
-    createdBy:{
-        type:Schema.Types.ObjectId, 
-        ref:'user'
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
     },
     likes: [
       {
@@ -24,11 +24,13 @@ const postSchema = Schema(
         type: Schema.Types.ObjectId,
         ref: "user",
       },
-    ],  
-    comments : {
-      type:Schema.Types.ObjectId,
-      ref:'comment'
-    }
+    ],
+    comments: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "comment",
+      },
+    ],
   },
   { timestamps: true }
 );

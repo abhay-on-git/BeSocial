@@ -3,6 +3,7 @@ var router = express.Router();
 const {resetPasswordViaOTP} = require('../utils/resetPasswordViaOTP')
 const userCollection = require("../models/userCollection");
 const Post = require('../models/post')
+const Comment = require('../models/comment')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -63,8 +64,10 @@ router.get('/resetOldPassword/:id',(req,res,next)=>{
 
 router.get('/feed',async (req,res,next)=>{
   const posts = await Post.find().populate('createdBy')
+  const comments = await Comment.find().populate('createdBy')
   res.render('feed',{
-    posts
+    posts,
+    comments,
   })
 })
 
