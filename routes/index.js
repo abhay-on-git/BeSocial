@@ -4,6 +4,7 @@ const {resetPasswordViaOTP} = require('../utils/resetPasswordViaOTP')
 const userCollection = require("../models/userCollection");
 const Post = require('../models/post')
 const Comment = require('../models/comment')
+const { isLoggedIn } = require("../middlewares/auth");
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -63,11 +64,26 @@ router.get('/resetOldPassword/:id',(req,res,next)=>{
 
 
 router.get('/feed',async (req,res,next)=>{
-  const posts = await Post.find().populate('createdBy')
+  let currentUserId = null;
+  console.log(req.user)
+  if(req.user){
+     currentUserId = req.user.id;
+  }
+  const posts = await Post.find()
+  .populate({
+    path : 'comments',
+    populate : {
+     path : 'createdBy',
+     model : 'user'
+    }
+  }).populate('createdBy').exec()
+  // console.log(posts)
   const comments = await Comment.find().populate('createdBy')
   res.render('feed',{
+    user :req.user, 
     posts,
     comments,
+    currentUserId,
   })
 })
 

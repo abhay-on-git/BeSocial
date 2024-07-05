@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const passport = require('passport')
 const passportLocal = require('passport-local')
+const postRouter = require('./routes/post')
 const session = require('express-session')
 const userCollection = require('./models/userCollection')
 const LocalStrategy = require("passport-local").Strategy;
@@ -48,6 +49,7 @@ passport.deserializeUser(userCollection.deserializeUser());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/post', postRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

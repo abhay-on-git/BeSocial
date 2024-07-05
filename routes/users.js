@@ -10,10 +10,9 @@ const userCollection = require("../models/userCollection");
 const { isLoggedIn } = require("../middlewares/auth");
 const upload = require("../utils/multer");
 const { resetPasswordViaOTP } = require("../utils/resetPasswordViaOTP");
-const Post = require("../models/post");
-const uploadPost = require("../utils/uploadPost");
-const { log } = require("console");
-const Comment = require("../models/comment");
+
+
+
 
 passport.use(
   new LocalStrategy(
@@ -175,114 +174,6 @@ router.post("/resetOldPassword", async (req, res, next) => {
   }
 });
 
-// Post CRUD Code Starts from here
-router.post(
-  "/create-post",
-  isLoggedIn,
-  uploadPost.single("postImage"),
-  async (req, res, next) => {
-    try {
-      const postData = req.body;
-      console.log(req.file.path);
-      if (req.file) {
-        postData.postImage = req.file.path;
-      } else {
-        postData.postImage = null;
-      }
-      postData.createdBy = req.user._id;
 
-      const post = await Post.create(postData);
-
-      post.createdBy = req.user._id;
-      req.user.posts.push(post._id);
-
-      await req.user.save();
-      await post.save();
-
-      res.redirect(`/feed`);
-    } catch (error) {
-      console.log(error.message);
-      throw error;
-    }
-  }
-);
-
-router.post("/like/:id", isLoggedIn, async (req, res, next) => {
-  // console.log(req,'userrrrrrIIIDDD')
-  try {
-    const pid = req.params.id;
-    const userId = req.user._id;
-    const post = await Post.findById(pid);
-    if (!post) {
-      return res.status(404).send("Post not found");
-    }
-    const isLiked = post.likes.includes(userId);
-    const isDisliked = post.dislikes.includes(userId);
-    if (isLiked) {
-      post.likes.pull(userId);
-    }
-    if (isDisliked) {
-      post.dislikes.pull(userId);
-    }
-    post.likes.push(userId);
-
-    await post.save();
-    res.redirect("/feed");
-  } catch (error) {
-    console.log(error.message);
-    throw error;
-  }
-});
-
-router.post("/dislike/:id", isLoggedIn, async (req, res, next) => {
-  // console.log(req,'userrrrrrIIIDDD')
-  try {
-    const pid = req.params.id;
-    const userId = req.user._id;
-    const post = await Post.findById(pid);
-    if (!post) {
-      return res.status(404).send("Post not found");
-    }
-    const isLiked = post.likes.includes(userId);
-    const isDisliked = post.dislikes.includes(userId);
-    if (isLiked) {
-      post.likes.pull(userId);
-    }
-    if (isDisliked) {
-      post.dislikes.pull(userId);
-    }
-    post.dislikes.push(userId);
-
-    await post.save();
-    res.redirect("/feed");
-  } catch (error) {
-    console.log(error.message);
-    throw error;
-  }
-});
-
-// comment Logic starts here
-
-router.post("/comment/:id", isLoggedIn, async (req, res, next) => {
-  const pid = req.params.id;
-  const comment = await Comment.create({
-    content : req.body.content,
-    createdBy :req.user._id,
-    postId : req.user.pid,
-  });
-  const post = await Post.findById(pid);
-  post.comments.push(comment._id);
-  await post.save();
-  await comment.save();
-  if(comment){
-    const post = await Post.findById(pid);
-    if (!post) {
-      return res.status(404).send("Post not found");
-    }
-    post.comments.push(comment);
-    await post.save();
-  }
-  res.redirect("/feed");
-});
 
 module.exports = router;
