@@ -5,7 +5,7 @@
   <div class="w-full px-[5rem] flex justify-between fixed bottom-8">
     <div></div>
     <button
-      onclick="document.getElementById('new-post-modal').classList.remove('hidden')"
+    onclick='openCreateModal()'
       class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
     >
       Add New Post
@@ -52,9 +52,10 @@
                 <i class="ri-more-2-fill"></i>
               </button>
               <div class="dropdown-content">
-                <div class="dropdown-item" >
-                  <i class="ri-edit-line" onclick="editPost('<%= post._id%>');"></i> Edit
+                <div class="dropdown-item" onclick="openEditModal('<%= post._id %>', '<%= post.postContent %>', '<%= post.postImage %>');">
+                  <i class="ri-edit-line"></i> Edit
                 </div>
+                
                 <div class="dropdown-item"  onclick="deletePost('<%= post._id%>');">
                   <i class="ri-delete-bin-line"></i> Delete
                 </div>
@@ -115,7 +116,7 @@
         <!-- Comment Section -->
         <div id="comments-<%= post._id %>" class="mt-4 hidden">
           <% post.comments.forEach(comment => { %> <%
-          console.log(comment.createdBy?.avatar , 'cccccccc') %>
+          // console.log(comment.createdBy?.avatar , 'cccccccc') %>
           <div class="flex items-center mb-2">
             <img
               src="/public/<%=comment.createdBy?.avatar  %>"
@@ -161,23 +162,29 @@
     </div>
   </div>
 
-  <!-- New Post Modal -->
+
+
+
+
+
+
+  <!-- ( New Post / Edit Post ) Modal -->
   <div
-    id="new-post-modal"
+    id="post-modal"
     class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden"
   >
     <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-semibold">Add New Post</h3>
+        <h3 id="modal-title" class="text-xl font-semibold">Add New Post</h3>
         <button
-          onclick="document.getElementById('new-post-modal').classList.add('hidden')"
+          onclick="document.getElementById('post-modal').classList.add('hidden')"
           class="text-gray-500 hover:text-gray-700"
         >
           &times;
         </button>
       </div>
       <form
-        action="/post/create-post"
+        // action="/post/create-post"
         method="POST"
         enctype="multipart/form-data"
         class="space-y-4"
@@ -215,10 +222,11 @@
           <span id="file-name" class="ml-2 text-gray-600"></span>
         </div>
         <button
+        id="submit-btn"
           type="submit"
           class="w-full bg-indigo-600 text-white p-3 rounded-lg hover:bg-indigo-700 transition-colors"
         >
-          Post
+          
         </button>
       </form>
     </div>
@@ -233,7 +241,50 @@
       const commentSection = document.getElementById("comments-" + postId);
       commentSection.classList.toggle("hidden");
     }
-  </script>
+    // create-modal-function
+function openCreateModal() {
+  const modal = document.getElementById('post-modal');
+  const form = modal.querySelector('form');
+  
+  // Set the form action to include the postId
+  form.action = `/post/create-post/`;
+
+  // Populate the modal fields with the post data
+  const contentTextarea = modal.querySelector('textarea[name="postContent"]');
+  contentTextarea.value = '';
+
+  const imageSpan = modal.querySelector('#file-name');
+  imageSpan.textContent = '';
+
+  const submitBtn = modal.querySelector('#submit-btn')
+  submitBtn.textContent = 'Post'
+
+  // Show the modal
+  modal.classList.remove('hidden');
+}
+
+// edit-modal-function
+function openEditModal(postId, postContent, postImage) {
+  const modal = document.getElementById('post-modal');
+  const form = modal.querySelector('form');
+  
+  // Set the form action to include the postId
+  form.action = `/post/editPost/${postId}`;
+
+  // Populate the modal fields with the post data
+  const contentTextarea = modal.querySelector('textarea[name="postContent"]');
+  contentTextarea.value = postContent;
+
+  const imageSpan = modal.querySelector('#file-name');
+  imageSpan.textContent = postImage || 'No image';
+
+  const submitBtn = modal.querySelector('#submit-btn')
+  submitBtn.textContent = 'Update Post'
+
+  // Show the modal
+  modal.classList.remove('hidden');
+}
+    </script>
 
   <%- include('./partials/footer') %>
 </div>
@@ -262,4 +313,25 @@
             console.error('Error:', error);
         }
     }
-</script>
+    // async function editPost(postId){
+    //   try {
+    //     const response = await fetch('/post/editPost/${postId}',{
+    //       method: 'GET',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //         },
+    //     });
+
+    //     if(response.ok){
+    //       //Handle successful updation
+    //       alert('Post updated successfully');
+    //       }else{
+    //         //Handle error
+    //         alert('Error in updating post');
+    //         }
+    //   } catch (error) {
+    //     console.log(error)
+    //     throw(error.message)
+    //   }
+    // }
+    </script>
