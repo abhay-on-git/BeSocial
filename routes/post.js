@@ -100,7 +100,7 @@ router.post("/comment/:id", isLoggedIn, async (req, res, next) => {
   const comment = await Comment.create({
     content: req.body.content,
     createdBy: req.user._id,
-    postId: req.user.pid,
+    postId: pid,
   });
   const post = await Post.findById(pid);
   await post.save();
@@ -119,7 +119,9 @@ router.post("/deletePost/:id", async (req, res, next) => {
   const pid = req.params.id;
 
   try {
+    console.log(pid)
     await Comment.deleteMany({ postId: pid });
+
     const post = await Post.findByIdAndDelete(pid);
     if (!post) {
       return res.status(404).send("Post not found");

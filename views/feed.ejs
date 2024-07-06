@@ -53,7 +53,7 @@
                 <% console.log(post._id,'POST-ID'); %>
                 <% console.log(post.postImage, 'POST-IMAGE'); %>
                 <% console.log(post.postContent, 'POST-CONTENT'); %>
-                <div class="dropdown-item" onclick="openEditModal('<%= post._id %>', '<%= (post.postContent) %>', '<%= (post.postImage) %>');">
+                <div class="dropdown-item" onclick="openEditModal(`<%= post._id %>`, `<%= (post.postContent) %>`, `<%= JSON.stringify(post.postImage) %>`)">
                   <i class="ri-edit-line"></i> Edit
                 </div>
                 
@@ -263,6 +263,8 @@ function openCreateModal() {
 
 // edit-modal-function
 function openEditModal(postId, postContent, postImage) {
+
+  console.log(postId,postContent,postImage,'iiiiiiiiiiiiiiiii')
   const modal = document.getElementById('post-modal');
   const form = modal.querySelector('form');
   
