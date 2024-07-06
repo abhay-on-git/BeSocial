@@ -4,8 +4,23 @@
 <!-- Profile Header Section -->
 <section class="w-full bg-[#4f46e5] text-white py-16 flex flex-col items-center">
   <div class="max-w-4xl text-center px-4">
-    <div class="relative mb-8">
-      <img src="/public/<%=user.avatar %>" alt="User Avatar" class="rounded-full h-40 w-40 mx-auto shadow-lg">
+    <div class="relative mb-5">
+      <img src="\<%=user.avatar %>" alt="User Avatar" class="rounded-full h-40 w-40 mx-auto shadow-lg">
+    </div>
+    <div class="flex gap-3 items-center justify-center mb-5">
+      <div class="w-[50px]">
+        <div class="text-[18px]"><%=user.posts.length %></div>
+        <p class="text-[12px] ">Posts</p>
+      </div>
+      <div class="w-[50px]">
+        <div class="text-[18px]"><%= user.followers.length %></div>
+        <p class="text-[12px]">Followers</p>
+      </div>
+      <div class="w-[50px]">
+        <div class="text-[18px]"><%= user.following.length %></div>
+        <p class="text-[12px]">Following</p>
+      </div>
+      
     </div>
     <h1 class="text-4xl font-bold mb-2"><%= user.username %></h1>
     <p class="text-lg mb-6"><%= user.bio %></p>

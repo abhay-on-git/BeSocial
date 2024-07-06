@@ -1,4 +1,6 @@
 const Post = require("../models/post");
+const fs = require('fs')
+const path = require('path')
 const uploadPost = require("../utils/uploadPost");
 const Comment = require("../models/comment");
 const { isLoggedIn } = require("../middlewares/auth");
@@ -139,7 +141,9 @@ router.post(
       const postData = req.body;
       if (req.file) {
         postData.postImage = req.file.path;
-        fs.unlinkSync(path.join(__dirname, "..", `${post.postImage}`));
+        if(post.postImage !== null){
+          fs.unlinkSync(path.join(__dirname, "..", `${post.postImage}`));
+        }
       } else {
         postData.postImage = post.postImage;
       }

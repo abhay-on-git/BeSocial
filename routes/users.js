@@ -85,7 +85,7 @@ router.post(
       if (req.file) {
         userData.avatar = req.file.path;
         if (!user.avatar.startsWith("https")) {
-          fs.unlinkSync(path.join(__dirname, "..", "public", `${user.avatar}`));
+          fs.unlinkSync(path.join(__dirname, "..",`${user.avatar}`));
         }
       } else {
         userData.avatar = user.avatar;
@@ -174,6 +174,15 @@ router.post("/resetOldPassword", async (req, res, next) => {
   }
 });
 
+// random user Profile Page Logic
+
+router.get('/profile/:id',async (req,res,next)=>{
+  const uid = req.params.id;
+  const user = await userCollection.findById(uid)
+  res.render('profile',{
+    user
+  })
+})
 
 
 module.exports = router;

@@ -19,7 +19,7 @@
       <!-- Profile Picture -->
       <div class="flex flex-col items-center mb-8">
         <div class="relative mb-4">
-          <img id="avatar-preview" src="/public/<%= user.avatar %>" alt="User Avatar" class="rounded-full h-32 w-32 mb-4 shadow-lg object-cover">
+          <img id="avatar-preview" src="\<%= user.avatar %>" alt="User Avatar" class="rounded-full h-32 w-32 mb-4 shadow-lg object-cover">
           <button type="button" id="change-avatar-button" class="absolute bottom-0 left-[20%] bg-[#4f46e5] text-white py-1 px-3 rounded-full hover:bg-[#3f40d1] transition duration-300">Change</button>
         </div>
         <input type="file" name="avatar" id="avatar-input" class="hidden" accept="image/*">

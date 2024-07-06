@@ -21,20 +21,17 @@
 
     <!-- Posts Feed -->
     <div class="space-y-6">
-      <!-- <% const dummyPosts = [
-                { author: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/1.jpg', createdAt: '2024-06-24', content: 'This is my first post!', image: 'https://via.placeholder.com/400x200' },
-                { author: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', createdAt: '2024-06-23', content: 'Loving this new social platform!', image: 'https://via.placeholder.com/400x200' },
-                { author: 'Alice Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg', createdAt: '2024-06-22', content: 'Can’t wait to see more updates!', image: 'https://via.placeholder.com/400x200' }
-            ]; %> -->
       <% posts.forEach(post => { %>
       <div class="bg-white p-4 rounded-lg shadow-md" id="post-<%= post._id %>">
         <div class="flex justify-between">
           <div class="flex items-center mb-2">
-            <img
-              src="<%=post.createdBy?.avatar ? '/public'+ post.createdBy?.avatar : 'https://randomuser.me/api/portraits/women/2.jpg'  %>"
+            <a href="/users/profile/<%= post.createdBy?._id %>">
+              <img
+              src="<%=post.createdBy?.avatar ? post.createdBy?.avatar : 'https://randomuser.me/api/portraits/women/2.jpg'  %>"
               alt="User Avatar"
               class="w-10 h-10 rounded-full mr-3"
             />
+            </a>
 
             <div>
               <h4 class="text-gray-900 font-semibold">
@@ -52,7 +49,11 @@
                 <i class="ri-more-2-fill"></i>
               </button>
               <div class="dropdown-content">
-                <div class="dropdown-item" onclick="openEditModal('<%= post._id %>', '<%= post.postContent %>', '<%= post.postImage %>');">
+                <% console.log(post,'POST'); %>
+                <% console.log(post._id,'POST-ID'); %>
+                <% console.log(post.postImage, 'POST-IMAGE'); %>
+                <% console.log(post.postContent, 'POST-CONTENT'); %>
+                <div class="dropdown-item" onclick="openEditModal('<%= post._id %>', '<%= (post.postContent) %>', '<%= (post.postImage) %>');">
                   <i class="ri-edit-line"></i> Edit
                 </div>
                 
@@ -119,7 +120,7 @@
           // console.log(comment.createdBy?.avatar , 'cccccccc') %>
           <div class="flex items-center mb-2">
             <img
-              src="/public/<%=comment.createdBy?.avatar  %>"
+              src="<%=comment.createdBy?.avatar  %>"
               alt="User Avatar"
               class="w-8 h-8 rounded-full mr-3"
             />
@@ -161,10 +162,6 @@
       <% }); %>
     </div>
   </div>
-
-
-
-
 
 
 
@@ -241,6 +238,7 @@
       const commentSection = document.getElementById("comments-" + postId);
       commentSection.classList.toggle("hidden");
     }
+
     // create-modal-function
 function openCreateModal() {
   const modal = document.getElementById('post-modal');
@@ -273,7 +271,7 @@ function openEditModal(postId, postContent, postImage) {
 
   // Populate the modal fields with the post data
   const contentTextarea = modal.querySelector('textarea[name="postContent"]');
-  contentTextarea.value = postContent;
+  contentTextarea.value = postContent || '';
 
   const imageSpan = modal.querySelector('#file-name');
   imageSpan.textContent = postImage || 'No image';
