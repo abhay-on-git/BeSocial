@@ -49,10 +49,10 @@
                 <i class="ri-more-2-fill"></i>
               </button>
               <div class="dropdown-content">
-                <% console.log(post,'POST'); %>
+                <!-- <% console.log(post,'POST'); %>
                 <% console.log(post._id,'POST-ID'); %>
                 <% console.log(post.postImage, 'POST-IMAGE'); %>
-                <% console.log(post.postContent, 'POST-CONTENT'); %>
+                <% console.log(post.postContent, 'POST-CONTENT'); %> -->
                 <div class="dropdown-item" onclick="openEditModal(`<%= post._id %>`, `<%= (post.postContent) %>`, `<%= JSON.stringify(post.postImage) %>`)">
                   <i class="ri-edit-line"></i> Edit
                 </div>

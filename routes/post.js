@@ -1,10 +1,11 @@
 const Post = require("../models/post");
-const fs = require('fs')
-const path = require('path')
+const fs = require("fs");
+const path = require("path");
 const uploadPost = require("../utils/uploadPost");
 const Comment = require("../models/comment");
 const { isLoggedIn } = require("../middlewares/auth");
 const { Router } = require("express");
+const mongoose = require("mongoose");
 const router = Router();
 
 // Post CRUD Code Starts from here
@@ -117,15 +118,23 @@ router.post("/comment/:id", isLoggedIn, async (req, res, next) => {
 
 router.post("/deletePost/:id", async (req, res, next) => {
   const pid = req.params.id;
+  const objectPID = new mongoose.Types.ObjectId(pid);
+  const user = req.user;
+
+  // console.log("User Posts Before:", user.posts);
+  // console.log("User Posts After:", user.posts);
+
+  user.posts = user.posts.filter((post) => !post.equals(objectPID));
 
   try {
-    console.log(pid)
+    console.log(pid);
     await Comment.deleteMany({ postId: pid });
 
     const post = await Post.findByIdAndDelete(pid);
     if (!post) {
       return res.status(404).send("Post not found");
     }
+    await user.save();
     res.redirect("/feed");
   } catch (error) {
     console.error("Error deleting post:", error);
@@ -143,7 +152,7 @@ router.post(
       const postData = req.body;
       if (req.file) {
         postData.postImage = req.file.path;
-        if(post.postImage !== null){
+        if (post.postImage !== null) {
           fs.unlinkSync(path.join(__dirname, "..", `${post.postImage}`));
         }
       } else {

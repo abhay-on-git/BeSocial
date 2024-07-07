@@ -61,7 +61,11 @@ router.post("/signin", (req, res, next) => {
 });
 
 router.get("/profile", isLoggedIn, (req, res, next) => {
-  res.render("profile", { user: req.user });
+  const loginUserId = req.user._id;
+  res.render("profile", { 
+    user: req.user,
+    loginUserId
+  });
 });
 
 router.get("/logout", isLoggedIn, (req, res, next) => {
@@ -177,12 +181,88 @@ router.post("/resetOldPassword", async (req, res, next) => {
 // random user Profile Page Logic
 
 router.get('/profile/:id',async (req,res,next)=>{
+try {
   const uid = req.params.id;
+  const loginUserId = req.user?._id
+// console.log(req.user, "profile user");
   const user = await userCollection.findById(uid)
-  res.render('profile',{
-    user
+  return res.render('profile',{
+    user,
+    loginUserId
   })
+} catch (error) {
+  console.log(error);
+  return res.json(error)
+}
 })
+
+// In the below userFollow and userFollowing route i have used the promise apis to avoid double fetching and avoid conflicts of interdependent results of fetching
+
+router.post('/followUser/:id', async (req, res, next) => {
+  try {
+    const uid = req.params.id; // ID of the user to be followed
+    const currentUserId = req.user?._id; // ID of the current logged-in user
+    
+console.log(req.user, "user");
+    // Fetch both users to avoid double fetching
+    const [userToFollow, currentUser] = await Promise.all([
+      userCollection.findById(uid),
+      userCollection.findById(currentUserId)
+    ]);
+
+    if (!userToFollow || !currentUser) {
+      return res.status(404).send('User not found');
+    }
+// console.log(currentUserId , "LcurrentUserId");
+    // Check if already following
+    if (!userToFollow.followers.includes(currentUserId) || !currentUser.following.includes(uid)) {
+      // Update both users
+      userToFollow.followers.push(currentUserId);
+      currentUser.following.push(uid);
+
+      // Save changes
+      await Promise.all([userToFollow.save(), currentUser.save()]);
+    }
+
+   return res.json({succes:true})
+  } catch (error) {
+    console.error('Error following user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.post('/unFollowUser/:id', isLoggedIn, async (req, res, next) => {
+  try {
+    const uid = req.params.id; // ID of the user to be followed
+    const currentUserId = req.user?._id; // ID of the current logged-in user
+    // console.log(currentUserId,'currentUserId')
+
+    // Fetch both users to avoid double fetching
+    const [userToUnFollow, currentUser] = await Promise.all([
+      userCollection.findById(uid),
+      userCollection.findById(currentUserId)
+    ]);
+
+    if (!userToUnFollow || !currentUser) {
+      return res.status(404).send('User not found');
+    }
+
+    // Check if already following
+    if (!userToUnFollow.followers.includes(currentUserId) && !currentUser.following.includes(uid)) {
+      // Update both users
+      userToUnFollow.followers.pull(currentUserId);
+      currentUser.following.pull(uid);
+
+      // Save changes
+      await Promise.all([userToUnFollow.save(), currentUser.save()]);
+    }
+
+    return res.json({succes:true})
+  } catch (error) {
+    console.error('Error following user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 module.exports = router;
