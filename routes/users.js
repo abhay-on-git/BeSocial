@@ -60,11 +60,13 @@ router.post("/signin", (req, res, next) => {
   })(req, res, next);
 });
 
-router.get("/profile", isLoggedIn, (req, res, next) => {
+router.get("/profile", isLoggedIn,async  (req, res, next) => {
   const loginUserId = req.user._id;
+  const loginUser = await userCollection.find(loginUserId)
   res.render("profile", { 
     user: req.user,
-    loginUserId
+    loginUserId,
+    loginUser
   });
 });
 
@@ -184,11 +186,13 @@ router.get('/profile/:id',async (req,res,next)=>{
 try {
   const uid = req.params.id;
   const loginUserId = req.user?._id
+  const loginUser = await userCollection.findById(loginUserId);
 // console.log(req.user, "profile user");
   const user = await userCollection.findById(uid)
   return res.render('profile',{
     user,
-    loginUserId
+    loginUserId,
+    loginUser
   })
 } catch (error) {
   console.log(error);
@@ -201,8 +205,8 @@ try {
 router.post('/followUser/:id', async (req, res, next) => {
   try {
     const uid = req.params.id; // ID of the user to be followed
-    const currentUserId = req.user?._id; // ID of the current logged-in user
-    
+    const currentUserId = (req.user?._id).toString(); // ID of the current logged-in user
+    console.log(currentUserId,'currentUserId')
 console.log(req.user, "user");
     // Fetch both users to avoid double fetching
     const [userToFollow, currentUser] = await Promise.all([
@@ -231,11 +235,11 @@ console.log(req.user, "user");
   }
 });
 
-router.post('/unFollowUser/:id', isLoggedIn, async (req, res, next) => {
+router.post('/unFollowUser/:id', async (req, res, next) => {
   try {
     const uid = req.params.id; // ID of the user to be followed
-    const currentUserId = req.user?._id; // ID of the current logged-in user
-    // console.log(currentUserId,'currentUserId')
+    const currentUserId = (req.user?._id).toString(); // ID of the current logged-in user
+    console.log(currentUserId,'currentUserId')
 
     // Fetch both users to avoid double fetching
     const [userToUnFollow, currentUser] = await Promise.all([
@@ -253,8 +257,11 @@ router.post('/unFollowUser/:id', isLoggedIn, async (req, res, next) => {
       userToUnFollow.followers.pull(currentUserId);
       currentUser.following.pull(uid);
 
+      
       // Save changes
       await Promise.all([userToUnFollow.save(), currentUser.save()]);
+      console.log(currentUser.following, userToUnFollow.followers);
+
     }
 
     return res.json({succes:true})

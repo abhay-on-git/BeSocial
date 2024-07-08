@@ -65,7 +65,7 @@ router.get('/resetOldPassword/:id',(req,res,next)=>{
 
 router.get('/feed',async (req,res,next)=>{
   let currentUserId = null;
-  console.log(req.user)
+  // console.log(req.user)
   if(req.user){
      currentUserId = req.user.id;
   }
