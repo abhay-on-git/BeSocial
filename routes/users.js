@@ -12,8 +12,6 @@ const upload = require("../utils/multer");
 const { resetPasswordViaOTP } = require("../utils/resetPasswordViaOTP");
 
 
-
-
 passport.use(
   new LocalStrategy(
     {
@@ -55,16 +53,25 @@ router.post("/signin", (req, res, next) => {
         console.error("Login error:", err);
         return next(err); // Call next middleware with the error
       }
-      return res.redirect("/users/profile");
+      return res.redirect("/feed");
     });
   })(req, res, next);
 });
 
 router.get("/profile", isLoggedIn,async  (req, res, next) => {
   const loginUserId = req.user._id;
-  const loginUser = await userCollection.find(loginUserId)
+  const user = await userCollection.findOne({ _id: loginUserId }).populate({
+    path :'posts',
+    populate:{
+      path:'createdBy',
+      model:'user'
+    }
+  });
+  // console.log(typeof(loginUserId),'loginUserId')
+  // console.log(typeof(user._id),'use._id')
+  const loginUser = {...user};
   res.render("profile", { 
-    user: req.user,
+    user,
     loginUserId,
     loginUser
   });
@@ -151,9 +158,7 @@ router.post("/verify-otp/:id", async (req, res, next) => {
     res.send(error.message);
   }
 });
-// router.post('/resend-otp/:id',async(req,res,next)=>{
-//   await resetPasswordViaOTP(req, res, user);
-// })
+
 router.post("/reset-password/:id", async (req, res, next) => {
   const id = req.params.id;
   try {
@@ -186,9 +191,9 @@ router.get('/profile/:id',async (req,res,next)=>{
 try {
   const uid = req.params.id;
   const loginUserId = req.user?._id
-  const loginUser = await userCollection.findById(loginUserId);
-// console.log(req.user, "profile user");
-  const user = await userCollection.findById(uid)
+  const loginUser = await userCollection.findById(loginUserId).populate('posts')
+  const user = await userCollection.findById(uid).populate('posts')
+  console.log(user,'profileIdUser')
   return res.render('profile',{
     user,
     loginUserId,
@@ -236,10 +241,10 @@ console.log(req.user, "user");
 });
 
 router.post('/unFollowUser/:id', async (req, res, next) => {
+  console.log('inside unFollow User')
   try {
     const uid = req.params.id; // ID of the user to be followed
     const currentUserId = (req.user?._id).toString(); // ID of the current logged-in user
-    console.log(currentUserId,'currentUserId')
 
     // Fetch both users to avoid double fetching
     const [userToUnFollow, currentUser] = await Promise.all([
@@ -252,7 +257,7 @@ router.post('/unFollowUser/:id', async (req, res, next) => {
     }
 
     // Check if already following
-    if (!userToUnFollow.followers.includes(currentUserId) && !currentUser.following.includes(uid)) {
+    if (userToUnFollow.followers.includes(currentUserId) && currentUser.following.includes(uid)) {
       // Update both users
       userToUnFollow.followers.pull(currentUserId);
       currentUser.following.pull(uid);

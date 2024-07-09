@@ -45,12 +45,19 @@
             Forums
           </a>
         </li>
+      <% } %>
+      <li>
+        <input type="text"
+        placeholder="Search here..."
+        class="border-[1.5px] border-[#4f46e5] text-[#4f46e5] rounded-full py-[4px] px-5 focus:outline-none focus:ring-2 focus:ring-[#4f46e5]"
+        >
+      </li>
+      <% if (locals.user) { %>
         <li>
-          <a
-            href="/users/profile/<% locals.user._id %>"
-            class="border-2 border-[#4f46e5] text-[#4f46e5] rounded-full py-[5px] px-5 hover:bg-[#4f46e5] hover:text-white transition duration-300"
-          >
-            Profile
+          <a href="/users/profile/<% locals.user._id %>">
+            <div class="overflow-hidden">
+              <img class="w-9 h-9 rounded-full" src="<%= user.avatar?.startsWith('https') ? user.avatar : '/' + user.avatar %>" alt="">
+            </div>
           </a>
         </li>
       <% }else { %>

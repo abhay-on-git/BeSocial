@@ -135,7 +135,7 @@ router.post("/deletePost/:id", async (req, res, next) => {
       return res.status(404).send("Post not found");
     }
     await user.save();
-    res.redirect("/feed");
+    res.redirect("back");
   } catch (error) {
     console.error("Error deleting post:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -164,7 +164,7 @@ router.post(
       if (!updatedPost) {
         return res.status(404).send("Post not found");
       }
-      res.redirect("/feed");
+      res.redirect("back");
     } catch (error) {
       console.log(error);
       throw error.message;
