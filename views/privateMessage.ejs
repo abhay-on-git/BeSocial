@@ -5,26 +5,9 @@
 
     <!-- Sidebar: Forum List -->
     <div class="lg:w-1/4 bg-white rounded-lg shadow-md p-4 mb-4 lg:mb-0">
-        <h2 class="text-xl font-semibold text-indigo-600 mb-4">Forums</h2>
+        <h2 class="text-xl font-semibold text-indigo-600 mb-4">Reacent Chats</h2>
         <ul class="space-y-2">
             <% var forums = ['General Discussion', 'Announcements', 'Feedback', 'Support', 'Off-Topic']; %>
-            <% forums.forEach(function(forum) { %>
-                <li>
-                    <a href="#"
-                        class="block p-2 rounded-lg text-gray-700 hover:bg-indigo-100 transition-colors">
-                        <%= forum %>
-                    </a>
-                </li>
-            <% }); %>
-        </ul>
-    </div>
-
-    <!-- Chat Area -->
-    <div class="flex-1 lg:pl-4 flex flex-col">
-        <div class="flex-1 bg-white rounded-lg shadow-md p-4 overflow-y-auto">
-            <h2 class="text-xl font-semibold text-indigo-600 mb-4">General Discussion</h2>
-            
-            <!-- Messages Container -->
             <div id="messages-container" class="space-y-4">
                 <% var dummyMessages = [
                     { author: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/1.jpg', createdAt: '2024-06-24 10:15', content: 'Hello everyone!' },
@@ -32,7 +15,7 @@
                     { author: 'Alice Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg', createdAt: '2024-06-24 10:25', content: 'Good morning!' }
                 ]; %>
                 <% dummyMessages.forEach(function(message) { %>
-                    <div class="flex items-start space-x-4">
+                    <div class="flex items-start p-1 rounded-lg text-gray-700 hover:bg-indigo-100 transition-colors cursor-pointer space-x-4">
                         <img src="<%= message.avatar %>" alt="User Avatar" class="w-10 h-10 rounded-full">
                         <div>
                             <div class="flex items-center space-x-2">
@@ -43,6 +26,32 @@
                         </div>
                     </div>
                 <% }); %>
+            </div>
+        </ul>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="flex-1 lg:pl-4 flex flex-col">
+        <div class="flex-1 bg-white rounded-lg shadow-md overflow-y-auto">
+            <div class="chatAreaHeader flex justify-between items-center p-3 px-5 bg-gray-200 p-2">
+                <div class="flex items-start space-x-4">
+                    <img src=" https://randomuser.me/api/portraits/men/1.jpg" alt="User Avatar" class="w-10 h-10 rounded-full">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h4 class="font-semibold text-[18px] text-gray-900">John Doe</h4>
+                        </div>
+                        <p class="text-gray-800 text-[12px]">last seen 10:45</p>
+                    </div>
+                </div>
+                <i class="ri-more-2-fill"></i>
+            </div>
+            <div id="chatArea" class="py-6 px-4 flex flex-col gap-3">
+                <div id="reciver-l" class="py-1 px-2 w-fit bg-gray-100 rounded-lg">
+                    How are you ?
+                </div>
+                <div id="sender-r" class="py-1 px-2 w-fit bg-gray-100 ml-auto rounded-lg">
+                    I am absolutly Fime...
+                </div>
             </div>
         </div>
 

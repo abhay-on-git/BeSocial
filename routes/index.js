@@ -93,4 +93,13 @@ router.get('/forums',(req,res,next)=>{
     id: req.params.id,
   })
 })
+
+router.get('/privateMessage/:id',async (req,res,next)=>{
+  const uid = req.params.id;
+  const user = await userCollection.findById(uid)
+  res.render('privateMessage',{
+    user,
+    id: req.params.id,
+  })
+})
 module.exports = router;

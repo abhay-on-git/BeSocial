@@ -193,7 +193,7 @@ try {
   const loginUserId = req.user?._id
   const loginUser = await userCollection.findById(loginUserId).populate('posts')
   const user = await userCollection.findById(uid).populate('posts')
-  console.log(user,'profileIdUser')
+  // console.log(user,'profileIdUser')
   return res.render('profile',{
     user,
     loginUserId,
@@ -212,7 +212,6 @@ router.post('/followUser/:id', async (req, res, next) => {
     const uid = req.params.id; // ID of the user to be followed
     const currentUserId = (req.user?._id).toString(); // ID of the current logged-in user
     console.log(currentUserId,'currentUserId')
-console.log(req.user, "user");
     // Fetch both users to avoid double fetching
     const [userToFollow, currentUser] = await Promise.all([
       userCollection.findById(uid),

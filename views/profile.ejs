@@ -32,12 +32,19 @@
       <p class="text-lg mb-6"><%= user.bio %></p>
       <% if (user._id.toString() !== loginUserId.toString()) { %>
         
-        <button id="followBtn"
-        onclick="followUnFollowLogic(`<%=loginUserId%>`,`<%=user._id%>`,`<%= JSON.stringify(user) %>`,`<%=JSON.stringify(loginUser)%>`)"
-        class="inline-block bg-white text-[#4f46e5] font-bold py-2 px-6 rounded-lg shadow-md hover:bg-gray-200 transition duration-300">
-      <%=user.followers.includes(loginUserId) ? 'Following' :  'Follow' %>
-
-  </button>
+        <div class="flex justify-center items-center gap-3">
+       <button id="followBtn"
+    onclick="followUnFollowLogic(
+        '<%= loginUserId %>',
+        '<%= user._id %>',
+        `<%=(JSON.stringify(user)) %>`,
+        `<%=(JSON.stringify(loginUser)) %>`
+    )"
+    class="inline-block bg-white text-[#4f46e5] font-bold py-2 px-8 rounded-lg shadow-md hover:bg-gray-200 transition duration-300">
+  <%= user.followers.includes(loginUserId) ? 'Following' : 'Follow' %>
+</button>
+      <a href="/privateMessage/<%=user._id  %>" class="inline-block bg-white cursor-pointer text-[#4f46e5] font-bold py-2 px-6 rounded-lg shadow-md hover:bg-gray-200 transition duration-300">Message</a>
+        </div>
 
       <% }else { %>
       <a
