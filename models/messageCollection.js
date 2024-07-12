@@ -11,13 +11,13 @@ const messageSchema =  mongoose.Schema({
         type: String,
         required: true
     },
-
     text: {
         type: String,
         required: true
     }
 
-})
+},{timestamps:true})
 
+const Message = mongoose.model('message', messageSchema)
 
-module.exports = mongoose.model('message', messageSchema);
+module.exports = Message;

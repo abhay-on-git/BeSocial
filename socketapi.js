@@ -28,7 +28,7 @@ io.on("connection", function (socket) {
       if (!loginUser) {
         console.error("loginUser not found or could not be updated");
       } else {
-        console.log("Updated loginUser:", loginUser);
+        // console.log("Updated loginUser:", loginUser);
       }
     } catch (error) {
       console.error("Error updating loginUser:", error);
@@ -36,32 +36,37 @@ io.on("connection", function (socket) {
   });
 
   socket.on("openChat", async (data) => {
-    console.log(data, "LLLLLLLLLLLLLLLLL11111111111111111");
     const { sender, reciver } = data;
-
-    const messages = await messageCollection.find({
-      $or: [
-        {
-          sender: sender,
-          receiver: reciver,
-        },
-        {
-          sender: reciver,
-          receiver: sender,
-        },
-      ],
-    });
-
-    socket.emit("openChat", messages);
+    console.log(sender, reciver);
+    
+    try {
+      const messages = await messageCollection.find({
+        $or: [
+          {
+            sender: sender,
+            reciver: reciver,
+          },
+          {
+            sender: reciver,
+            reciver: sender,
+          },
+        ],
+      });
+      console.log(messages, "LLLLLLLLLLLLLLLLL11111111111111111");
+      socket.emit("openChat", messages);
+    } catch (error) {
+      console.log(error)
+      throw(error.message)
+    }
   });
 
-  socket.on("messageObject", async (data) => {
-    console.log(data);
+  socket.on("messageObject", async (messageObject) => {
+    console.log(messageObject);
     const reciver = await userCollection.findOne({
-      email: data.reciver,
+      email: messageObject.reciver,
     });
 
-    console.log(reciver, "rrrrrrrrr");
+    // console.log(reciver, "rrrrrrrrr");
     const socketId = reciver.socketId;
     await messageCollection.create({
       sender: messageObject.sender,
