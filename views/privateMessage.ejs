@@ -1,72 +1,175 @@
-<%- include('./partials/header') %>
-<%- include('./partials/nav') %>
+<%- include('./partials/header') %> <%- include('./partials/nav') %>
 
 <div class="min-h-[43vmax] p-4 flex flex-col lg:flex-row bg-gray-100">
+  <!-- Sidebar: Forum List -->
+  <div class="lg:w-1/4 bg-white rounded-lg shadow-md p-4 mb-4 lg:mb-0">
+    <h2 class="text-xl font-semibold text-indigo-600 mb-4">Recent Chats</h2>
+    <ul class="space-y-2">
+      <div id="messages-container" class="space-y-4">
+        <% users.forEach(function(user) { %>
+          <%console.log(user)%>
+        <li onclick="openChat('<%= user.avatar %>', '<%= user.username %>')">
+          <div
+            class="flex items-start p-1 rounded-lg text-gray-700 hover:bg-indigo-100 transition-colors cursor-pointer space-x-4"
+          >
+            <img
+              src="<%= user.avatar?.startsWith('https') ? user.avatar : '/' + user.avatar %>"
+              alt="User Avatar"
+              class="w-10 h-10 rounded-full"
+            />
+            <div>
+              <div class="flex items-center space-x-2">
+                <h4 class="font-semibold text-gray-900">
+                  <%= user.username %>
+                </h4>
+              </div>
+              <p class="text-[12px] text-gray-500"><%= user.bio %></p>
+            </div>
+          </div>
+        </li>
+        <% }); %>
+      </div>
+    </ul>
+  </div>
 
-    <!-- Sidebar: Forum List -->
-    <div class="lg:w-1/4 bg-white rounded-lg shadow-md p-4 mb-4 lg:mb-0">
-        <h2 class="text-xl font-semibold text-indigo-600 mb-4">Reacent Chats</h2>
-        <ul class="space-y-2">
-            <% var forums = ['General Discussion', 'Announcements', 'Feedback', 'Support', 'Off-Topic']; %>
-            <div id="messages-container" class="space-y-4">
-                <% var dummyMessages = [
-                    { author: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/1.jpg', createdAt: '2024-06-24 10:15', content: 'Hello everyone!' },
-                    { author: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', createdAt: '2024-06-24 10:20', content: 'Hi John! How are you?' },
-                    { author: 'Alice Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg', createdAt: '2024-06-24 10:25', content: 'Good morning!' }
-                ]; %>
-                <% dummyMessages.forEach(function(message) { %>
-                    <div class="flex items-start p-1 rounded-lg text-gray-700 hover:bg-indigo-100 transition-colors cursor-pointer space-x-4">
-                        <img src="<%= message.avatar %>" alt="User Avatar" class="w-10 h-10 rounded-full">
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h4 class="font-semibold text-gray-900"><%= message.author %></h4>
-                                <span class="text-gray-500 text-sm"><%= new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></span>
-                            </div>
-                            <p class="text-gray-800"><%= message.content %></p>
-                        </div>
-                    </div>
-                <% }); %>
+  <!-- Chat Area -->
+  <div class="flex-1 lg:pl-4 flex flex-col">
+    <div class="flex-1 bg-white rounded-lg shadow-md overflow-y-auto">
+      <div
+        id="chatAreaHeader"
+        class="flex justify-between items-center p-3 px-5 bg-gray-200 p-2"
+      >
+        <div class="flex items-start space-x-4">
+          <img
+            id="chatAvatar"
+            src="<%= user.avatar?.startsWith('https') ? user.avatar : '/' + user.avatar %>"
+            alt="User Avatar"
+            class="w-10 h-10 rounded-full"
+          />
+          <div>
+            <div class="flex items-center space-x-2">
+              <h4
+                id="chatUsername"
+                class="font-semibold text-[18px] text-gray-900"
+              >
+                <%=user.username%>
+              </h4>
             </div>
-        </ul>
-    </div>
-
-    <!-- Chat Area -->
-    <div class="flex-1 lg:pl-4 flex flex-col">
-        <div class="flex-1 bg-white rounded-lg shadow-md overflow-y-auto">
-            <div class="chatAreaHeader flex justify-between items-center p-3 px-5 bg-gray-200 p-2">
-                <div class="flex items-start space-x-4">
-                    <img src=" https://randomuser.me/api/portraits/men/1.jpg" alt="User Avatar" class="w-10 h-10 rounded-full">
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <h4 class="font-semibold text-[18px] text-gray-900">John Doe</h4>
-                        </div>
-                        <p class="text-gray-800 text-[12px]">last seen 10:45</p>
-                    </div>
-                </div>
-                <i class="ri-more-2-fill"></i>
-            </div>
-            <div id="chatArea" class="py-6 px-4 flex flex-col gap-3">
-                <div id="reciver-l" class="py-1 px-2 w-fit bg-gray-100 rounded-lg">
-                    How are you ?
-                </div>
-                <div id="sender-r" class="py-1 px-2 w-fit bg-gray-100 ml-auto rounded-lg">
-                    I am absolutly Fime...
-                </div>
-            </div>
+            <p id="lastseen" class="text-gray-800 text-[12px]">
+              last seen 10:45
+            </p>
+          </div>
         </div>
+        <i class="ri-more-2-fill"></i>
+      </div>
 
-        <!-- New Message Form -->
-        <form action="#" method="POST" class="mt-4 flex space-x-2">
-            <input type="text" id="message" name="message" required 
-                class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                placeholder="Type your message...">
-            <button type="submit" 
-                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
-                Send
-            </button>
-        </form>
+      <div
+        id="chatArea"
+        class="py-6 px-4 flex flex-col gap-3 overflow-y-auto h-96"
+      >
+        <div class="py-1 px-2 w-fit bg-gray-100 rounded-lg">How are you?</div>
+        <div class="py-1 px-2 w-fit bg-gray-100 ml-auto rounded-lg">
+          I am absolutely fine...
+        </div>
+      </div>
     </div>
 
+    <!-- New Message Form -->
+    <form id="messageForm" class="mt-4 flex space-x-2">
+      <input
+        id="messageInput"
+        type="text"
+        name="message"
+        required
+        class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        placeholder="Type your message..."
+      />
+      <button
+        id="sendMessageBtn"
+        type="submit"
+        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+      >
+        Send
+      </button>
+    </form>
+  </div>
 </div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script defer>
+  console.log('hiiiiiiiiiiiii');
+  const socket = io();
+  const loginUser = JSON.parse('<%- JSON.stringify(loginUser).replace(/\\/g, '\\\\') %>');
+  
+  const user = JSON.parse('<%- JSON.stringify(user).replace(/\\/g, '\\\\') %>');
+  console.log(loginUser, user, "uuuuuuuuuu ");
+
+  const chatArea = document.getElementById('chatArea');
+  socket.emit("join", loginUser);
+
+  function openChat(userAvatar, userName) {
+    console.log("inside openChat");
+    document.getElementById("chatAvatar").src = userAvatar.startsWith("https")
+      ? userAvatar
+      : "/" + userAvatar;
+    document.getElementById("chatUsername").innerHTML = userName;
+
+    socket.emit("openChat", {
+      reciver: user.email,
+      sender: loginUser.email,
+    });
+  }
+
+  socket.on("openChat", (messages) => {
+    messages.forEach((messageObject) => {
+      console.log(messageObject);
+      if (messageObject.sender === loginUser.email) {
+        appendOutgoingMessage(messageObject.text);
+      } else {
+        appendIncomingMessage(messageObject.text);
+      }
+    });
+  });
+
+  socket.on("max", (messageObject) => {
+    appendIncomingMessage(messageObject.message);
+  });
+
+  document
+    .getElementById("messageForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+      sendMessage();
+    });
+
+  function sendMessage() {
+    let messageInput = document.getElementById("messageInput");
+    let message = messageInput.value.trim();
+
+    if (message !== "") {
+      appendOutgoingMessage(message);
+      socket.emit("messageObject", {
+        message,
+        reciver: user.email,
+        sender: loginUser.email,
+      });
+      messageInput.value = ""; // Clear the input field
+    }
+  }
+
+  // Append incoming messages
+  function appendIncomingMessage(message) {
+    const chatArea = document.getElementById("chatArea");
+    const template = `<div class="py-1 px-2 w-fit bg-gray-100 rounded-lg">${message}</div>`;
+    chatArea.innerHTML += template;
+  }
+
+  // Append outgoing messages
+  function appendOutgoingMessage(message) {
+    const chatArea = document.getElementById("chatArea");
+    const template = `<div class="py-1 px-2 w-fit bg-gray-100 ml-auto rounded-lg">${message}</div>`;
+    chatArea.innerHTML += template;
+  }
+</script>
 
 <%- include('./partials/footer') %>

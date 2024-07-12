@@ -6,11 +6,15 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const passport = require('passport')
 const passportLocal = require('passport-local')
-const postRouter = require('./routes/post')
 const session = require('express-session')
-const userCollection = require('./models/userCollection')
 const LocalStrategy = require("passport-local").Strategy;
 
+// socket
+
+
+// models
+const postRouter = require('./routes/post')
+const userCollection = require('./models/userCollection')
 
 
 require("./dbConnection").connect().then(()=>console.log("MONGO-DB Connected"))

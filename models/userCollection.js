@@ -5,7 +5,11 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const userSchema = new Schema(
   {
     username: String,
-    email: String,
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     password: String,
     confirmPassword: String,
     bio: {
@@ -52,6 +56,7 @@ const userSchema = new Schema(
         ref: "user",
       },
     ],
+    socketId : String,
   },
   { timestamps: true }
 );

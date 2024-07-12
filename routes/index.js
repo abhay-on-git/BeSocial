@@ -5,6 +5,7 @@ const userCollection = require("../models/userCollection");
 const Post = require('../models/post')
 const Comment = require('../models/comment')
 const { isLoggedIn } = require("../middlewares/auth");
+const he = require('he')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -95,11 +96,27 @@ router.get('/forums',(req,res,next)=>{
 })
 
 router.get('/privateMessage/:id',async (req,res,next)=>{
-  const uid = req.params.id;
+  try {
+    const uid = req.params.id;
+    const loginUserId = req.user._id
+    const users = await userCollection.find({
+      _id: { $ne: req.user._id }
+  });
+
   const user = await userCollection.findById(uid)
-  res.render('privateMessage',{
+  const loginUser = await userCollection.findById(loginUserId)
+
+  return res.render('privateMessage',{
     user,
-    id: req.params.id,
+    loginUser,
+    users,
+    he
   })
+  } catch (error) {
+    res.send(error)
+    console.log(error.message
+      
+    )
+  }
 })
 module.exports = router;
