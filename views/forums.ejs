@@ -5,7 +5,10 @@
 
     <!-- Sidebar: Forum List -->
     <div class="lg:w-1/4 bg-white rounded-lg shadow-md p-4 mb-4 lg:mb-0">
-        <h2 class="text-xl font-semibold text-indigo-600 mb-4">Forums</h2>
+        <div class="flex justify-between ">
+            <h2 class="text-xl font-semibold text-indigo-600 mb-4">Forums</h2>
+            <a href="/recentChats" class="text-sm text-[#4f46e5] hover:underline">Recent Chats</a>
+        </div>
         <ul class="space-y-2">
             <% var forums = ['General Discussion', 'Announcements', 'Feedback', 'Support', 'Off-Topic']; %>
             <% forums.forEach(function(forum) { %>

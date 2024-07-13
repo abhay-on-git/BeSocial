@@ -52,14 +52,14 @@
         class="border-[1.5px] border-[#4f46e5] text-[#4f46e5] rounded-full py-[4px] px-5 focus:outline-none focus:ring-2 focus:ring-[#4f46e5]"
         >
       </li>
-      <% if (user) { %>
+      <% if (typeof user !== 'undefined' || typeof loginUser !== 'undefined') { %>
         <li>
           <a href="/users/profile/">
             <div class="overflow-hidden">
-              <% if (typeof loginUser !== 'undefined' && loginUser && loginUser._id && loginUser._id.toString() !== user._id.toString()) { %>
+              <% if (typeof loginUser !== 'undefined' && loginUser && loginUser._id && loginUser._id.toString() !== user?._id?.toString()) { %>
                 <img class="w-9 h-9 rounded-full" src="<%= loginUser.avatar?.startsWith('https') ? loginUser.avatar : '/' + loginUser.avatar %>" alt="">
                 <% } else { %>
-                <img class="w-9 h-9 rounded-full" src="<%= user.avatar?.startsWith('https') ? user.avatar : '/' + user.avatar %>" alt="">
+                  <img class="w-9 h-9 rounded-full" src="<%= user?.avatar?.startsWith('https') ? user.avatar : '/' + user.avatar %>" alt="">
               <% } %>
             </div>
           </a>
