@@ -2,65 +2,67 @@
 <%- include('./partials/nav') %>
 
 <div class="min-h-[43vmax] p-4 flex flex-col lg:flex-row bg-gray-100">
-
-    <!-- Sidebar: Forum List -->
-    <div class="lg:w-1/4 bg-white rounded-lg shadow-md p-4 mb-4 lg:mb-0">
-        <div class="flex justify-between ">
-            <h2 class="text-xl font-semibold text-indigo-600 mb-4">Forums</h2>
-            <a href="/recentChats" class="text-sm text-[#4f46e5] hover:underline">Recent Chats</a>
-        </div>
-        <ul class="space-y-2">
-            <% var forums = ['General Discussion', 'Announcements', 'Feedback', 'Support', 'Off-Topic']; %>
-            <% forums.forEach(function(forum) { %>
-                <li>
-                    <a href="#"
-                        class="block p-2 rounded-lg text-gray-700 hover:bg-indigo-100 transition-colors">
-                        <%= forum %>
-                    </a>
-                </li>
-            <% }); %>
-        </ul>
+  <!-- Sidebar: Forum List -->
+  <div class="lg:w-1/4 bg-white rounded-lg shadow-md p-4 mb-4 lg:mb-0">
+    <div class="flex justify-between">
+      <h2 class="text-xl font-semibold text-indigo-600 mb-4">Forums</h2>
+      <a href="/recentChats" class="text-sm text-[#4f46e5] hover:underline">Recent Chats</a>
     </div>
+    <ul class="space-y-2">
+      <% var forums = ['General Discussion', 'Announcements', 'Feedback', 'Support', 'Off-Topic']; %>
+      <% forums.forEach(function(forum) { %>
+      <li>
+        <div 
+        class="block p-2 rounded-lg text-gray-700 hover:bg-indigo-100 cursor-pointer transition-colors"
+        onclick="joinChannel(`<%=forum%>`)">
+          <%= forum %>
+        </div>
+      </li>
+      <% }); %>
+    </ul>
+  </div>
 
-    <!-- Chat Area -->
-    <div class="flex-1 lg:pl-4 flex flex-col">
-        <div class="flex-1 bg-white rounded-lg shadow-md p-4 overflow-y-auto">
-            <h2 class="text-xl font-semibold text-indigo-600 mb-4">General Discussion</h2>
-            
-            <!-- Messages Container -->
-            <div id="messages-container" class="space-y-4">
-                <% var dummyMessages = [
-                    { author: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/1.jpg', createdAt: '2024-06-24 10:15', content: 'Hello everyone!' },
-                    { author: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', createdAt: '2024-06-24 10:20', content: 'Hi John! How are you?' },
-                    { author: 'Alice Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg', createdAt: '2024-06-24 10:25', content: 'Good morning!' }
-                ]; %>
-                <% dummyMessages.forEach(function(message) { %>
-                    <div class="flex items-start space-x-4">
-                        <img src="<%= message.avatar %>" alt="User Avatar" class="w-10 h-10 rounded-full">
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h4 class="font-semibold text-gray-900"><%= message.author %></h4>
-                                <span class="text-gray-500 text-sm"><%= new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></span>
-                            </div>
-                            <p class="text-gray-800"><%= message.content %></p>
-                        </div>
-                    </div>
-                <% }); %>
+  <!-- Chat Area -->
+  <div class="flex-1 lg:pl-4 flex flex-col">
+    <div class="flex-1 bg-white rounded-lg shadow-md p-4 overflow-y-auto">
+      <h2 id="forumTitle" class="text-xl font-semibold text-indigo-600 mb-4">
+        General Discussion
+      </h2>
+
+      <!-- Messages Container -->
+      <div id="messages-container" class="space-y-4">
+        <% var dummyMessages = [ { author: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/1.jpg', createdAt: '2024-06-24 10:15', content: 'Hello everyone!' }, { author: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', createdAt: '2024-06-24 10:20', content: 'Hi John! How are you?' }, { author: 'Alice Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg', createdAt: '2024-06-24 10:25', content: 'Good morning!' } ]; %>
+        <% dummyMessages.forEach(function(message) { %>
+        <div class="flex items-start space-x-4">
+          <img src="<%= message.avatar %>" alt="User Avatar" class="w-10 h-10 rounded-full" />
+          <div>
+            <div class="flex items-center space-x-2">
+              <h4 class="font-semibold text-gray-900"><%= message.author %></h4>
+              <span class="text-gray-500 text-sm"><%= new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></span>
             </div>
+            <p class="text-gray-800"><%= message.content %></p>
+          </div>
         </div>
-
-        <!-- New Message Form -->
-        <form action="#" method="POST" class="mt-4 flex space-x-2">
-            <input type="text" id="message" name="message" required 
-                class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                placeholder="Type your message...">
-            <button type="submit" 
-                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
-                Send
-            </button>
-        </form>
+        <% }); %>
+      </div>
     </div>
 
+    <!-- New Message Form -->
+    <form action="#" method="POST" class="mt-4 flex space-x-2">
+      <input type="text" id="message" name="message" required class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Type your message..." />
+      <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">Send</button>
+    </form>
+  </div>
 </div>
-
 <%- include('./partials/footer') %>
+
+<script src="/socket.io/socket.io.js"></script>
+<script defer>
+  const socket = io();
+  function joinChannel(forum) {
+    document.getElementById('forumTitle').innerHTML = forum;
+    loginUser = JSON.parse('<%- JSON.stringify(loginUser).replace(/\\/g, '\\\\') %>');
+    socket.emit('joinRoom', {forum , loginUser});
+  }
+</script>
+

@@ -10,26 +10,15 @@ const he = require("he");
 io.on("connection", function (socket) {
   console.log("A user connected");
   socket.on("join", async (loginUser) => {
-    
-    console.log(loginUser);
     if (!loginUser) {
       console.error("Invalid loginUser data");
       return;
     }
 
-
     try {
-       const user = await userCollection.findByIdAndUpdate(
-         loginUser._id,
-         { socketId: socket.id },
-       
-       );
-
-      if (!loginUser) {
-        console.error("loginUser not found or could not be updated");
-      } else {
-        // console.log("Updated loginUser:", loginUser);
-      }
+      const user = await userCollection.findByIdAndUpdate(loginUser._id, {
+        socketId: socket.id,
+      });
     } catch (error) {
       console.error("Error updating loginUser:", error);
     }
@@ -37,8 +26,7 @@ io.on("connection", function (socket) {
 
   socket.on("openChat", async (data) => {
     const { sender, reciver } = data;
-    console.log(sender, reciver);
-    
+
     try {
       const messages = await messageCollection.find({
         $or: [
@@ -52,16 +40,14 @@ io.on("connection", function (socket) {
           },
         ],
       });
-      console.log(messages, "LLLLLLLLLLLLLLLLL11111111111111111");
       socket.emit("openChat", messages);
     } catch (error) {
-      console.log(error)
-      throw(error.message)
+      console.log(error);
+      throw error.message;
     }
   });
 
   socket.on("messageObject", async (messageObject) => {
-    console.log(messageObject);
     const reciver = await userCollection.findOne({
       email: messageObject.reciver,
     });
@@ -75,6 +61,34 @@ io.on("connection", function (socket) {
     });
 
     socket.to(socketId).emit("max", messageObject);
+  });
+
+  // -------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+  let usp = io.of("/user-namespace");
+  usp.on("connection", async (socket) => {
+    const userId = socket.handshake.auth.token;
+    const user = await userCollection.findByIdAndUpdate(userId, {
+      $set: { isOnline: 1 },
+    });
+    // update onlineUser Status
+    socket.broadcast.emit("getOnlineUser", { userId });
+
+    socket.on("disconnect", async () => {
+      // console.log("user disconnected");
+      const userId = socket.handshake.auth.token;
+      const lastSeen = new Date();
+      const user = await userCollection.findByIdAndUpdate(userId, {
+        $set: { isOnline: 0, lastSeen: lastSeen },
+      });
+      // update offlineUser Status
+      socket.broadcast.emit("getOfflineUser", { userId,lastSeen });
+    });
+  });
+
+  socket.on("joinRoom", ({ forum, loginUser }) => {
+    socket.join(forum);
+    console.log(`Abhay has Joined ${forum} `);
   });
 });
 

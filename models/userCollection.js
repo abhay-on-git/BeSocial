@@ -57,7 +57,14 @@ const userSchema = new Schema(
       },
     ],
     socketId : String,
+
+    isOnline : {
+      type : Boolean,
+      default : 0,
+    },
+    lastSeen :String
   },
+  
   { timestamps: true }
 );
 

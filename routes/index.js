@@ -84,10 +84,13 @@ router.get("/feed", async (req, res, next) => {
   });
 });
 
-router.get("/forums", (req, res, next) => {
+router.get("/forums",async (req, res, next) => {
+  const loginUserId = req.user._id;
+  const loginUser = await userCollection.findById(loginUserId);
   res.render("forums", {
     user: req.user,
     id: req.params.id,
+    loginUser,
   });
 });
 
@@ -96,7 +99,7 @@ router.get("/privateMessage/:id", async (req, res, next) => {
     const uid = req.params.id;
     const loginUserId = req.user._id;
     const users = await userCollection.find({
-      _id: { $ne: req.user._id },
+      _id: { $ne: loginUserId },
     });
 
     const user = await userCollection.findById(uid);

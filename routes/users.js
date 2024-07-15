@@ -37,7 +37,6 @@ router.post("/signup", async function (req, res, next) {
 });
 
 router.post("/signin", (req, res, next) => {
-  // console.log("Request body:", req.body);
 
   passport.authenticate("local", (err, user, info) => {
     if (err) {
@@ -53,6 +52,8 @@ router.post("/signin", (req, res, next) => {
         console.error("Login error:", err);
         return next(err); // Call next middleware with the error
       }
+      const userData = JSON.stringify(req.user);
+      res.cookie('user',userData)
       return res.redirect("/feed");
     });
   })(req, res, next);
@@ -79,6 +80,7 @@ router.get("/profile", isLoggedIn,async  (req, res, next) => {
 
 router.get("/logout", isLoggedIn, (req, res, next) => {
   req.logout(() => {
+    res.clearCookie('user');
     res.redirect("/signin");
   });
 });
