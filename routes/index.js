@@ -6,6 +6,7 @@ const Post = require("../models/post");
 const Comment = require("../models/comment");
 const { isLoggedIn } = require("../middlewares/auth");
 const he = require("he");
+const groupModel = require("../models/groupModel");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -86,11 +87,13 @@ router.get("/feed", async (req, res, next) => {
 
 router.get("/forums",async (req, res, next) => {
   const loginUserId = req.user._id;
+  const forums = await groupModel.find()
   const loginUser = await userCollection.findById(loginUserId);
   res.render("forums", {
     user: req.user,
     id: req.params.id,
     loginUser,
+    forums,
   });
 });
 
@@ -110,6 +113,7 @@ router.get("/privateMessage/:id", async (req, res, next) => {
       loginUser,
       users,
       he,
+      uid,
     });
   } catch (error) {
     res.send(error);

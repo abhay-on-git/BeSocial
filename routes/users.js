@@ -3,6 +3,7 @@ const router = express.Router();
 const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
+const groupModel = require('../models/groupModel')
 
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -277,5 +278,16 @@ router.post('/unFollowUser/:id', async (req, res, next) => {
   }
 });
 
+
+router.post('/create-group',async (req,res,next)=>{
+  console.log(req.body)
+   try {
+    const group = await groupModel.create(req.body)
+   } catch (error) {
+    console.log(error)
+    throw error.message
+   }
+   res.redirect('back')
+})
 
 module.exports = router;

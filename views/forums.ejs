@@ -4,7 +4,7 @@
 <div class="min-h-[43vmax] p-4 flex flex-col lg:flex-row bg-gray-100">
   <!-- Sidebar: Forum List -->
   <div class="lg:w-1/4 bg-white rounded-lg shadow-md p-4 mb-4 lg:mb-0">
-    <div class="flex justify-between">
+    <div class="flex  justify-between">
       <h2 class="text-xl font-semibold text-indigo-600 mb-4">Forums</h2>
       <a href="/recentChats" class="text-sm text-[#4f46e5] hover:underline">Recent Chats</a>
     </div>
@@ -13,9 +13,24 @@
       <% forums.forEach(function(forum) { %>
       <li>
         <div 
-        class="block p-2 rounded-lg text-gray-700 hover:bg-indigo-100 cursor-pointer transition-colors"
-        onclick="joinChannel(`<%=forum%>`)">
-          <%= forum %>
+        class="block p-1 flex items-center justify-between rounded-lg text-gray-700 hover:bg-indigo-100 cursor-pointer transition-colors"
+        onclick="joinChannel('<%= forum %>')">
+          <%= forum%>
+          <div class="flex gap-3">
+            <div class="dropdown">
+              <button class="p-2 rounded-lg">
+                <i class="ri-more-2-fill"></i>
+              </button>
+              <div class="dropdown-content">
+                <div class="dropdown-item" onclick="openEditModal()">
+                  <i class="ri-edit-line"></i> Edit
+                </div>
+                <div class="dropdown-item" onclick="deletePost();">
+                  <i class="ri-delete-bin-line"></i> Delete
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </li>
       <% }); %>
@@ -25,9 +40,12 @@
   <!-- Chat Area -->
   <div class="flex-1 lg:pl-4 flex flex-col">
     <div class="flex-1 bg-white rounded-lg shadow-md p-4 overflow-y-auto">
-      <h2 id="forumTitle" class="text-xl font-semibold text-indigo-600 mb-4">
-        General Discussion
-      </h2>
+      <div class="flex items-center justify-between">
+        <h2 id="forumTitle" class="text-xl font-semibold text-indigo-600 mb-4">
+          General Discussion
+        </h2>
+        <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors" onclick="openCreateModal()">Create New Channel</button>
+      </div>
 
       <!-- Messages Container -->
       <div id="messages-container" class="space-y-4">
@@ -54,15 +72,99 @@
     </form>
   </div>
 </div>
+
+<!-- (New Post / Edit Post) Modal -->
+<div id="post-modal" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden">
+  <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+    <div class="flex justify-between items-center mb-4">
+      <h3 id="modal-title" class="text-xl font-semibold">Create New Group</h3>
+      <button onclick="document.getElementById('post-modal').classList.add('hidden')" class="text-gray-500 hover:text-gray-700">
+        &times;
+      </button>
+    </div>
+    <form method="POST" action="" class="space-y-4">
+      <div>
+        <label for="groupName" class="block text-gray-700 font-semibold mb-2">Group Name:</label>
+        <input id="groupName" type="text" name="groupName" required class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Socialism...">
+      </div>
+      <div>
+        <label for="limit" class="block text-gray-700 font-semibold mb-2">Max Members:</label>
+        <input id="limit" type="number" name="limit" required class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter Number of Participants" min="1">
+      </div>
+      <button id="submit-btn" type="submit" class="w-full bg-indigo-600 text-white p-3 rounded-lg hover:bg-indigo-700 transition-colors"></button>
+    </form>
+  </div>
+</div>
+
 <%- include('./partials/footer') %>
 
-<script src="/socket.io/socket.io.js"></script>
-<script defer>
-  const socket = io();
-  function joinChannel(forum) {
-    document.getElementById('forumTitle').innerHTML = forum;
-    loginUser = JSON.parse('<%- JSON.stringify(loginUser).replace(/\\/g, '\\\\') %>');
-    socket.emit('joinRoom', {forum , loginUser});
+<script>
+  // create-modal-function
+  function openCreateModal() {
+    const modal = document.getElementById('post-modal');
+    const form = modal.querySelector('form');
+
+    // Set the form action to create a new group
+    form.action = '/users/create-group';
+
+    // Reset the modal fields
+    const groupName = modal.querySelector('#groupName');
+    groupName.value = '';
+
+    const limit = modal.querySelector('#limit');
+    limit.value = '';
+
+    const submitBtn = modal.querySelector('#submit-btn');
+    submitBtn.textContent = 'Create';
+
+    // Show the modal
+    modal.classList.remove('hidden');
+  }
+
+  // edit-modal-function
+  function openEditModal(groupId, groupName, limit) {
+    const modal = document.getElementById('post-modal');
+    const form = modal.querySelector('form');
+    const modalTitle = modal.querySelector('#modal-title')
+
+    modalTitle.textContent = 'Edit Group Info'
+
+    // Set the form action to edit the group
+    form.action = `/users/editGroup/${groupId}`;
+
+    // Populate the modal fields with the group data
+    const groupNameField = modal.querySelector('#groupName');
+    groupNameField.value = groupName || 'No Name';
+
+    const limitField = modal.querySelector('#limit');
+    limitField.value = limit || '';
+
+    const submitBtn = modal.querySelector('#submit-btn');
+    submitBtn.textContent = 'Update';
+
+    // Show the modal
+    modal.classList.remove('hidden');
+  }
+
+  // delete post function
+  async function deletePost(postId) {
+    try {
+      const response = await fetch(`/post/deletePost/${postId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        // Handle successful deletion
+        document.getElementById(`post-${postId}`).remove();
+      } else {
+        // Handle error
+        alert('Error deleting post');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   }
 </script>
-
