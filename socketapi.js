@@ -4,7 +4,7 @@ const messageCollection = require("./models/messageCollection");
 const socketapi = {
   io: io,
 };
-const he = require("he");
+const groupChatModel = require("./models/groupChat");
 
 // Add your socket.io logic here!
 io.on("connection", function (socket) {
@@ -86,10 +86,40 @@ io.on("connection", function (socket) {
     });
   });
 
-  socket.on("joinRoom", ({ forum, loginUser }) => {
-    socket.join(forum);
-    console.log(`Abhay has Joined ${forum} `);
+  // groupChat logic
+  socket.on('groupMessage', async (groupMessage) => {
+    const groupId = groupMessage.reciver;
+  
+    try {
+      const newMessage = await groupChatModel.create({
+        createdBy: groupMessage.sender,
+        groupId: groupMessage.reciver,
+        message: groupMessage.message,
+      });
+      // console.log(newMessage);
+      
+      await newMessage.populate('createdBy')
+      socket.emit("groupChatMessage",newMessage)
+    } catch (error) {
+      console.error('Error creating group message:', error);
+      // Handle error appropriately
+    }
   });
+  
+
+  socket.on("openGroupChat", async (groupId) => {
+    try {
+      const messages = await groupChatModel.find({ groupId: groupId }).populate("createdBy");
+      // console.log(groupId,'gggggggggggggg')
+      // console.log(messages,'sssssssssssssssssss')
+      socket.emit("openGroupChat", messages);
+    } catch (error) {
+      console.log(error);
+      throw error.message;
+    }
+  });
+  
+
 });
 
 // end of socket.io logic

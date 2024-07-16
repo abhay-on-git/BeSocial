@@ -9,13 +9,14 @@
       <a href="/recentChats" class="text-sm text-[#4f46e5] hover:underline">Recent Chats</a>
     </div>
     <ul class="space-y-2">
-      <% var forums = ['General Discussion', 'Announcements', 'Feedback', 'Support', 'Off-Topic']; %>
       <% forums.forEach(function(forum) { %>
       <li>
         <div 
-        class="block p-1 flex items-center justify-between rounded-lg text-gray-700 hover:bg-indigo-100 cursor-pointer transition-colors"
-        onclick="joinChannel('<%= forum %>')">
-          <%= forum%>
+        forumId = '<%= forum._id%>'
+        forumName = '<%= forum.groupName%>'
+        class="forumTiles block p-1 flex items-center justify-between rounded-lg text-gray-700 hover:bg-indigo-100 cursor-pointer transition-colors"
+        >
+          <%= forum.groupName%>
           <div class="flex gap-3">
             <div class="dropdown">
               <button class="p-2 rounded-lg">
@@ -40,18 +41,18 @@
   <!-- Chat Area -->
   <div class="flex-1 lg:pl-4 flex flex-col">
     <div class="flex-1 bg-white rounded-lg shadow-md p-4 overflow-y-auto">
-      <div class="flex items-center justify-between">
+      <div id="chatHeader" class="flex items-center justify-between">
         <h2 id="forumTitle" class="text-xl font-semibold text-indigo-600 mb-4">
-          General Discussion
+          Select Channel
         </h2>
-        <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors" onclick="openCreateModal()">Create New Channel</button>
+        <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors" onclick="openCreateModal()">Create New Forum</button>
       </div>
 
       <!-- Messages Container -->
-      <div id="messages-container" class="space-y-4">
+      <div id="chatArea" class="space-y-4">
         <% var dummyMessages = [ { author: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/1.jpg', createdAt: '2024-06-24 10:15', content: 'Hello everyone!' }, { author: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', createdAt: '2024-06-24 10:20', content: 'Hi John! How are you?' }, { author: 'Alice Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg', createdAt: '2024-06-24 10:25', content: 'Good morning!' } ]; %>
         <% dummyMessages.forEach(function(message) { %>
-        <div class="flex items-start space-x-4">
+        <div  class="dummyMessages flex items-start space-x-4">
           <img src="<%= message.avatar %>" alt="User Avatar" class="w-10 h-10 rounded-full" />
           <div>
             <div class="flex items-center space-x-2">
@@ -66,8 +67,8 @@
     </div>
 
     <!-- New Message Form -->
-    <form action="#" method="POST" class="mt-4 flex space-x-2">
-      <input type="text" id="message" name="message" required class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Type your message..." />
+    <form id="groupChatForm" method="POST" class="mt-4 flex space-x-2">
+      <input id="messageInput" type="text" id="message" name="message" required class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Type your message..." />
       <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">Send</button>
     </form>
   </div>
@@ -98,7 +99,7 @@
 
 <%- include('./partials/footer') %>
 
-<script>
+<script >
   // create-modal-function
   function openCreateModal() {
     const modal = document.getElementById('post-modal');
@@ -168,3 +169,5 @@
     }
   }
 </script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="../public/javascripts/forum.js"></script>

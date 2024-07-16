@@ -28,8 +28,8 @@ document.querySelectorAll(".userTile").forEach((user) => {
   });
 });
 
-privateChatById = document.getElementById("privateChatById").value;
-if (privateChatById.toString() !== "null") {
+privateChatById = document.getElementById("privateChatById").value.toString();
+if (privateChatById !== "null") {
   const userData = document.getElementById("userData");
   avatar = userData.getAttribute("userAvatar");
   username = userData.getAttribute("userName");
@@ -109,6 +109,7 @@ function appendOutgoingMessage(message) {
   chatArea.innerHTML += template;
 }
 
+
 socket.on("getOnlineUser", ({ userId }) => {
   const lastSeenElement = document.getElementById(`${userId}-status`);
   if (lastSeenElement) {
@@ -123,3 +124,6 @@ socket.on("getOfflineUser", ({ userId, lastSeen }) => {
     lastSeenElement.textContent = `Last seen: ${lastSeenDate.toLocaleString()}`;
   }
 });
+
+
+
