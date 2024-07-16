@@ -350,11 +350,11 @@
     class="w-full bg-[#4f46e5] text-white py-16 flex flex-col items-center"
   >
     <div class="max-w-3xl text-center px-4">
-      <h2 class="text-4xl font-bold mb-6">Get More Involved with BeSocial!</h2>
-      <p class="text-lg leading-relaxed mb-6">
-        Discover more ways to contribute, connect with new groups, and join
-        activities that matter. Explore now!
-      </p>
+      <h2 class="text-4xl font-bold mb-6">See You Soon on BeSocial!</h2>
+<p class="text-lg leading-relaxed mb-6">
+  Thank you for being part of our community! We hope you had a great time connecting and contributing. Come back soon to join more exciting activities!
+</p>
+
       <a
         href="/users/logout"
         class="inline-block bg-white text-[#4f46e5] font-bold py-3 px-8 rounded-lg shadow-md hover:bg-gray-200 transition duration-300"
@@ -365,82 +365,6 @@
 
   <%- include('./partials/footer') %>
 
-  <script>
-    async function followUnFollowLogic(loginUserId,userId,user,loginUser ){
-
-      try {
-
-        const objuser = JSON.parse(user)
-        const objloginuser = JSON.parse(loginUser)
-
-        if(objloginuser.following.includes(userId) && objuser.followers.includes(loginUserId)){
-          console.log("unfollow")
-          await unFollowUser(userId)
-        }else{
-          console.log("follow")
-          await followUser(userId)
-        }
-      
-      } catch (error) {
-        console.error("Error parsing user object:", error);
-        alert("An error occurred. Please try again later.");
-        return;
-      }
-      
-  }
-    
-  async function followUser(userId) {
-      const followBtn = document.getElementById('followBtn');
-      console.log(userId);
-      try {
-        const response = await fetch(`/users/followUser/${userId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        if (response.ok) {
-          // Assuming the server sends a message on successful follow
-          // followBtn.textContent = 'Following'
-          // alert("Following successfully!");
-        } else {
-          // followBtn.textContent = 'Follow'
-          alert(`Failed to follow: ${error.message || "Unknown error"}`);
-        }
-      } catch (error) {
-        console.error("Error following user:", error);
-        alert("An error occurred while trying to follow the user.");
-        // followBtn.textContent = 'Follow'
-      }
-    }
-
-    async function unFollowUser(userId) {
-      const followBtn = document.getElementById('followBtn');
-      try {
-        const response = await fetch(`/users/unFollowUser/${userId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        console.log(response);
-        if (response.ok) {
-          // Assuming the server sends a message on successful follow
-          // followBtn.textContent = 'Follow'
-          // alert("unFollow successfully!");
-        } else {
-          // Handle non-OK responses, including a possible error message from the server
-          // followBtn.textContent = 'Following'
-          alert(`Failed to follow: ${error.message || "Unknown error"}`);
-        }
-      } catch (error) {
-        // Catch network errors or other unexpected issues
-        console.error("Error following user:", error);
-        // followBtn.textContent = 'Following'
-        alert("An error occurred while trying to follow the user.");
-      }
-    }
-  </script>
 
   <!-- ( New Post / Edit Post ) Modal -->
   <div
@@ -465,8 +389,8 @@
       >
         <div>
           <label for="content" class="block text-gray-700 font-semibold mb-2"
-            >Post Content:</label
-          >
+            >Post Content:
+            </label>
           <textarea
             id="content"
             name="postContent"
@@ -505,66 +429,76 @@
       </form>
     </div>
   </div>
-
   <script>
-    function showFileName(input) {
-      const fileName = input.files[0] ? input.files[0].name : "";
-      document.getElementById("file-name").textContent = fileName;
+  async function followUnFollowLogic(loginUserId, userId, user, loginUser) {
+    try {
+      const objuser = JSON.parse('<%- JSON.stringify(user).replace(/\\/g, '\\\\') %>'); 
+      const objloginuser = JSON.parse('<%- JSON.stringify(loginUser).replace(/\\/g, '\\\\') %>');
+
+      if (objloginuser.following.includes(userId) && objuser.followers.includes(loginUserId)) {
+        await unFollowUser(userId);
+      } else {
+        await followUser(userId);
+      }
+    } catch (error) {
+      console.error("Error parsing user object:", error);
+      alert("An error occurred. Please try again later.");
     }
-    function toggleComments(postId) {
-      const commentSection = document.getElementById("comments-" + postId);
-      commentSection.classList.toggle("hidden");
+  }
+
+  async function followUser(userId) {
+    const followBtn = document.getElementById('followBtn');
+    try {
+      const response = await fetch(`/users/followUser/${userId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+        followBtn.textContent = 'Following';
+      } else {
+        alert(`Failed to follow: ${response.statusText || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Error following user:", error);
+      alert("An error occurred while trying to follow the user.");
     }
+  }
 
-    // create-modal-function
-function openCreateModal() {
-  const modal = document.getElementById('post-modal');
-  const form = modal.querySelector('form');
-  
-  // Set the form action to include the postId
-  form.action = `/post/create-post/`;
+  async function unFollowUser(userId) {
+    const followBtn = document.getElementById('followBtn');
+    try {
+      const response = await fetch(`/users/unFollowUser/${userId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+        followBtn.textContent = 'Follow';
+      } else {
+        alert(`Failed to unfollow: ${response.statusText || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      alert("An error occurred while trying to unfollow the user.");
+    }
+  }
 
-  // Populate the modal fields with the post data
-  const contentTextarea = modal.querySelector('textarea[name="postContent"]');
-  contentTextarea.value = '';
+  function showFileName(input) {
+    const fileName = input.files[0] ? input.files[0].name : "";
+    document.getElementById("file-name").textContent = fileName;
+  }
 
-  const imageSpan = modal.querySelector('#file-name');
-  imageSpan.textContent = '';
+  function toggleComments(postId) {
+    const commentSection = document.getElementById("comments-" + postId);
+    commentSection.classList.toggle("hidden");
+  }
+</script>
 
-  const submitBtn = modal.querySelector('#submit-btn')
-  submitBtn.textContent = 'Post'
-
-  // Show the modal
-  modal.classList.remove('hidden');
-}
-
-// edit-modal-function
-function openEditModal(postId, postContent, postImage) {
-
-  console.log(postId,postContent,postImage,'iiiiiiiiiiiiiiiii')
-  const modal = document.getElementById('post-modal');
-  const form = modal.querySelector('form');
-  
-  // Set the form action to include the postId
-  form.action = `/post/editPost/${postId}`;
-
-  // Populate the modal fields with the post data
-  const contentTextarea = modal.querySelector('textarea[name="postContent"]');
-  contentTextarea.value = postContent || '';
-
-  const imageSpan = modal.querySelector('#file-name');
-  imageSpan.textContent = postImage || 'No image';
-
-  const submitBtn = modal.querySelector('#submit-btn')
-  submitBtn.textContent = 'Update Post'
-
-  // Show the modal
-  modal.classList.remove('hidden');
-}
-    </script>
 
   <%- include('./partials/footer') %>
-</div>
 
 <!-- JS Logic for deletion and Updation -->
 

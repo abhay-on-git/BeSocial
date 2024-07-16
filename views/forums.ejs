@@ -12,6 +12,7 @@
       <% forums.forEach(function(forum) { %>
       <li>
         <div 
+        id='group-<%= forum._id%>'
         forumId = '<%= forum._id%>'
         forumName = '<%= forum.groupName%>'
         class="forumTiles block p-1 flex items-center justify-between rounded-lg text-gray-700 hover:bg-indigo-100 cursor-pointer transition-colors"
@@ -23,10 +24,10 @@
                 <i class="ri-more-2-fill"></i>
               </button>
               <div class="dropdown-content">
-                <div class="dropdown-item" onclick="openEditModal()">
+                <div class="dropdown-item" onclick="openEditModal('<%= forum._id%>','<%= forum.groupName%>','<%= forum.limit%>')">
                   <i class="ri-edit-line"></i> Edit
                 </div>
-                <div class="dropdown-item" onclick="deletePost();">
+                <div class="dropdown-item" onclick="deleteGroup('<%= forum._id%>')">
                   <i class="ri-delete-bin-line"></i> Delete
                 </div>
               </div>
@@ -148,9 +149,9 @@
   }
 
   // delete post function
-  async function deletePost(postId) {
+  async function deleteGroup(groupId) {
     try {
-      const response = await fetch(`/post/deletePost/${postId}`, {
+      const response = await fetch(`/users/deleteGroup/${groupId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,7 +160,7 @@
 
       if (response.ok) {
         // Handle successful deletion
-        document.getElementById(`post-${postId}`).remove();
+        document.getElementById(`group-${groupId}`).remove();
       } else {
         // Handle error
         alert('Error deleting post');

@@ -278,6 +278,7 @@ router.post('/unFollowUser/:id', async (req, res, next) => {
   }
 });
 
+// group routes started here
 
 router.post('/create-group',async (req,res,next)=>{
   console.log(req.body)
@@ -289,5 +290,37 @@ router.post('/create-group',async (req,res,next)=>{
    }
    res.redirect('back')
 })
+
+router.post("/deleteGroup/:id", async (req, res, next) => {
+  const pid = req.params.id;
+
+  try {
+    await groupModel.findByIdAndDelete(pid);
+    res.redirect("back");
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.post(
+  "/editGroup/:id",
+  async (req, res, next) => {
+    const pid = req.params.id;
+    try {
+      const postData = req.body;
+      const updatedGroup = await groupModel.findByIdAndUpdate(pid, postData, {
+        new: true,
+      });
+      if (!updatedGroup) {
+        return res.status(404).send("Post not found");
+      }
+      res.redirect("back");
+    } catch (error) {
+      console.log(error);
+      throw error.message;
+    }
+  }
+);
 
 module.exports = router;
