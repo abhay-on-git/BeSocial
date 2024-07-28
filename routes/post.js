@@ -7,6 +7,7 @@ const { isLoggedIn } = require("../middlewares/auth");
 const { Router } = require("express");
 const mongoose = require("mongoose");
 const router = Router();
+const sendmail = require("../utils/mailer").sendmail; // Corre
 
 // Post CRUD Code Starts from here
 router.post(
@@ -31,6 +32,7 @@ router.post(
 
       await req.user.save();
       await post.save();
+      
 
       res.redirect(`/feed`);
     } catch (error) {
@@ -58,8 +60,9 @@ router.post("/like/:id", isLoggedIn, async (req, res, next) => {
       post.dislikes.pull(userId);
     }
     post.likes.push(userId);
-
+   
     await post.save();
+    sendmail(req,res,user = req.user)
     res.redirect("/feed");
   } catch (error) {
     console.log(error.message);
@@ -87,6 +90,7 @@ router.post("/dislike/:id", isLoggedIn, async (req, res, next) => {
     post.dislikes.push(userId);
 
     await post.save();
+    sendmail(req,res,user = req.user)
     res.redirect("/feed");
   } catch (error) {
     console.log(error.message);

@@ -53,7 +53,7 @@ io.on("connection", function (socket) {
     });
 
     // console.log(reciver, "rrrrrrrrr");
-    const socketId = reciver.socketId;
+    // const socketId = reciver.socketId;
     await messageCollection.create({
       sender: messageObject.sender,
       reciver: messageObject.reciver,
